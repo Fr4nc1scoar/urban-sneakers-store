@@ -114,12 +114,11 @@ export default function ProductCard3D({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       data-interactive="true"
-      data-cursor-text="ZAPATO"
-      className={`product-card-interactive group relative rounded-3xl p-[1px] overflow-hidden transition-all duration-300 ${accent.borderHover} ${accent.shadow}`}
+      className={`product-card-interactive group relative rounded-2xl sm:rounded-3xl p-[1px] overflow-hidden transition-all duration-300 ${accent.borderHover} ${accent.shadow}`}
     >
       {/* Dynamic Cursor Spotlight Border with Multi-Color Neon */}
       <div
-        className="pointer-events-none absolute inset-0 rounded-3xl transition-opacity duration-300 z-10"
+        className="pointer-events-none absolute inset-0 rounded-2xl sm:rounded-3xl transition-opacity duration-300 z-10"
         style={{
           opacity: mousePos.isHover ? 1 : 0,
           background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, rgba(244, 63, 94, 0.7) 0%, rgba(245, 158, 11, 0.35) 40%, transparent 75%)`,
@@ -127,10 +126,10 @@ export default function ProductCard3D({
       />
 
       {/* Static Luxury Border */}
-      <div className="absolute inset-0 rounded-3xl border border-white/[0.08] pointer-events-none z-10" />
+      <div className="absolute inset-0 rounded-2xl sm:rounded-3xl border border-white/[0.08] pointer-events-none z-10" />
 
       {/* Main Card Surface */}
-      <div className="relative rounded-[23px] bg-[#0c0d18]/92 backdrop-blur-2xl overflow-hidden h-full flex flex-col justify-between z-20 transition-all duration-300 group-hover:bg-[#0e0f1e]">
+      <div className="relative rounded-[15px] sm:rounded-[23px] bg-[#0c0d18]/92 backdrop-blur-2xl overflow-hidden h-full flex flex-col justify-between z-20 transition-all duration-300 group-hover:bg-[#0e0f1e]">
         {/* Sneaker Image Box */}
         <div
           onClick={() => onSelectProduct(product, selectedSize || undefined)}
@@ -138,7 +137,7 @@ export default function ProductCard3D({
         >
           {/* Vibrant Ambient Radial Glow matching the shoe's brand */}
           <div
-            className="absolute w-48 h-48 rounded-full blur-3xl opacity-35 group-hover:opacity-70 group-hover:scale-125 transition-all duration-500"
+            className="absolute w-36 h-36 sm:w-48 sm:h-48 rounded-full blur-2xl sm:blur-3xl opacity-35 group-hover:opacity-70 group-hover:scale-125 transition-all duration-500"
             style={{ backgroundColor: accent.glow }}
           />
 
@@ -150,27 +149,28 @@ export default function ProductCard3D({
           />
 
           {/* Top Gradient Vignette */}
-          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/80 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 top-0 h-12 sm:h-16 bg-gradient-to-b from-black/80 to-transparent pointer-events-none" />
 
           {/* Luxury Brand Tag */}
-          <div className="absolute top-3.5 left-3.5 z-10">
+          <div className="absolute top-2 left-2 sm:top-3.5 sm:left-3.5 z-10">
             <span
-              className={`px-3 py-1 rounded-xl text-[10px] font-mono font-black tracking-wider uppercase border border-white/20 backdrop-blur-xl ${accent.badge}`}
+              className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-lg sm:rounded-xl text-[9px] sm:text-[10px] font-mono font-black tracking-wider uppercase border border-white/20 backdrop-blur-xl ${accent.badge}`}
             >
               {product.brand}
             </span>
           </div>
 
           {/* Stock Tag with Pulsing Neon Dot */}
-          <div className="absolute top-3.5 right-3.5 z-10">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-black/75 text-emerald-300 border border-emerald-500/50 backdrop-blur-xl shadow-md">
+          <div className="absolute top-2 right-2 sm:top-3.5 sm:right-3.5 z-10">
+            <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[8.5px] sm:text-[10px] font-mono font-bold bg-black/75 text-emerald-300 border border-emerald-500/50 backdrop-blur-xl shadow-md">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
-              STOCK EN VIVO
+              <span className="hidden xs:inline">STOCK EN VIVO</span>
+              <span className="xs:hidden">EN VIVO</span>
             </span>
           </div>
 
-          {/* Hover View Button Overlay */}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+          {/* Hover View Button Overlay (Desktop) */}
+          <div className="hidden sm:flex absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 items-center justify-center pointer-events-none">
             <span className="px-4 py-2 rounded-full bg-black/85 text-white text-xs font-bold font-mono tracking-wide flex items-center gap-2 backdrop-blur-xl border border-white/25 shadow-2xl scale-95 group-hover:scale-100 transition-transform">
               <Eye className="w-3.5 h-3.5 text-rose-400" /> VER DETALLES
             </span>
@@ -178,23 +178,60 @@ export default function ProductCard3D({
         </div>
 
         {/* Card Body & Info */}
-        <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+        <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between space-y-2.5 sm:space-y-4">
           <div>
             <h3
               onClick={() => onSelectProduct(product, selectedSize || undefined)}
-              className="font-bold text-[15px] text-white group-hover:text-rose-400 transition-colors line-clamp-1 cursor-pointer tracking-tight"
+              className="font-bold text-xs sm:text-[15px] text-white group-hover:text-rose-400 transition-colors line-clamp-1 cursor-pointer tracking-tight"
               title={product.name}
             >
               {product.name}
             </h3>
 
             {/* Sizes selector chips */}
-            <div className="mt-3">
-              <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2 font-mono">
-                <span className="text-slate-400">Tallas disponibles:</span>
+            <div className="mt-2 sm:mt-3">
+              <div className="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 mb-1.5 sm:mb-2 font-mono">
+                <span className="text-slate-400 hidden xs:inline">Tallas:</span>
                 <span className="text-amber-400 font-bold">{product.sizes.length} tallas</span>
               </div>
-              <div className="flex flex-wrap gap-1.5">
+
+              {/* Mobile compact sizes (top 3) */}
+              <div className="flex sm:hidden flex-wrap gap-1">
+                {product.sizes.slice(0, 3).map((size) => {
+                  const isSelected = selectedSize === size;
+                  return (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedSize(size);
+                      }}
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all ${
+                        isSelected
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'bg-white/[0.05] text-slate-200 border border-white/[0.08]'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  );
+                })}
+                {product.sizes.length > 3 && (
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectProduct(product);
+                    }}
+                    className="px-1 py-0.5 rounded text-[9px] font-mono text-slate-400 bg-white/[0.04]"
+                  >
+                    +{product.sizes.length - 3}
+                  </span>
+                )}
+              </div>
+
+              {/* Desktop sizes (top 5) */}
+              <div className="hidden sm:flex flex-wrap gap-1.5">
                 {product.sizes.slice(0, 5).map((size) => {
                   const isSelected = selectedSize === size;
                   return (
@@ -232,19 +269,19 @@ export default function ProductCard3D({
           </div>
 
           {/* Pricing & CTA */}
-          <div className="pt-3 border-t border-white/[0.08] flex items-center justify-between gap-3">
+          <div className="pt-2 sm:pt-3 border-t border-white/[0.08] flex items-center justify-between gap-1.5 sm:gap-3">
             <div>
               <div className="flex items-baseline gap-1">
-                <span className="text-xl font-black text-white tracking-tight">
+                <span className="text-base sm:text-xl font-black text-white tracking-tight">
                   ${product.price}
                 </span>
-                <span className="text-[11px] font-mono font-bold text-slate-400 uppercase">
+                <span className="text-[9px] sm:text-[11px] font-mono font-bold text-slate-400 uppercase">
                   USD
                 </span>
               </div>
-              <div className="text-[10px] font-mono text-amber-400 flex items-center gap-1 font-bold">
-                <Sparkles className="w-3 h-3 text-amber-400" />
-                <span>Cuotas quincenales</span>
+              <div className="text-[9px] sm:text-[10px] font-mono text-amber-400 flex items-center gap-0.5 sm:gap-1 font-bold">
+                <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400 flex-shrink-0" />
+                <span className="truncate">Cuotas</span>
               </div>
             </div>
 
@@ -252,7 +289,7 @@ export default function ProductCard3D({
             <button
               type="button"
               onClick={handleAddToCartClick}
-              className={`px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all duration-200 shadow-md cursor-pointer ${
+              className={`p-2 sm:px-3.5 sm:py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all duration-200 shadow-md cursor-pointer flex-shrink-0 ${
                 justAdded
                   ? 'bg-emerald-500 text-black border border-emerald-400'
                   : 'bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white shadow-[0_0_15px_rgba(244,63,94,0.45)] hover:shadow-[0_0_25px_rgba(244,63,94,0.7)]'
@@ -261,12 +298,12 @@ export default function ProductCard3D({
             >
               {justAdded ? (
                 <>
-                  <Check className="w-4 h-4 stroke-[3]" />
+                  <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[3]" />
                   <span className="hidden sm:inline font-mono">Listo</span>
                 </>
               ) : (
                 <>
-                  <ShoppingBag className="w-4 h-4" />
+                  <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline font-mono">Pedir</span>
                 </>
               )}

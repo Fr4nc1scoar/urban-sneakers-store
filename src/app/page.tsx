@@ -6,7 +6,6 @@ import Navbar from '@/components/Navbar';
 import HeroBanner from '@/components/HeroBanner';
 import ProductCard3D from '@/components/ProductCard3D';
 import BackgroundGlow from '@/components/BackgroundGlow';
-import MouseFollower from '@/components/MouseFollower';
 import FloatingCartPill from '@/components/FloatingCartPill';
 import RotatingWhatsAppStamp from '@/components/RotatingWhatsAppStamp';
 import ProductDetailModal from '@/components/ProductDetailModal';
@@ -192,9 +191,6 @@ export default function StorefrontPage() {
     <div className="min-h-screen flex flex-col bg-[#06060c] relative overflow-x-hidden">
       {/* High-End Ambient Background & Dynamic Spotlight Glow (Unique Capital / Iqxion style) */}
       <BackgroundGlow />
-
-      {/* Magnetic Smooth Mouse Follower */}
-      <MouseFollower />
 
       {/* Navbar (Clean luxury look, Admin link removed) */}
       <Navbar

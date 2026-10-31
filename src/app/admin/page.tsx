@@ -33,6 +33,7 @@ import {
   TrendingUp,
   Tag,
   Zap,
+  X,
 } from 'lucide-react';
 import AdminInstallmentModal from '@/components/AdminInstallmentModal';
 
