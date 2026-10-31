@@ -65,7 +65,7 @@ export default function OrderSuccessModal({
           {order.isCredit && (
             <div className="pt-2 border-t border-slate-800 text-[11px] text-amber-300 flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-              <span>Modalidad Crédito: 2 cuotas de ${Math.round(order.totalAmount / 2)} USD</span>
+              <span>Modalidad Crédito: Cuotas quincenales a acordar con el vendedor</span>
             </div>
           )}
         </div>
@@ -79,7 +79,7 @@ export default function OrderSuccessModal({
             className="w-full py-3.5 px-4 rounded-xl font-bold text-sm text-white whatsapp-glow flex items-center justify-center gap-2 transition-all"
           >
             <MessageCircle className="w-5 h-5" />
-            <span>Abrir Chat con Alberto (+58 424-8057420)</span>
+            <span>Abrir Chat con el Vendedor (+58 424-8057420)</span>
           </a>
 
           <button

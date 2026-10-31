@@ -120,7 +120,7 @@ export default function ProductDetailModal({
               </div>
               <div className="mt-2 pt-2 border-t border-slate-800 text-xs text-slate-300 flex items-center justify-between">
                 <span>Facilidad de pago:</span>
-                <strong className="text-amber-400">2 cuotas quincenales de ${installmentAmount}</strong>
+                <strong className="text-amber-400">Cuotas quincenales a acordar con el vendedor</strong>
               </div>
             </div>
 

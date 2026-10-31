@@ -8,12 +8,12 @@
   "paymentDetails": {
     "pagoMovil": {
       "banco": "Banesco (0134)",
-      "cedula": "V-24.805.742",
+      "cedula": "V-28.492.228",
       "telefono": "0424-8057420",
       "titular": "Alberto Calzados"
     },
     "binancePay": {
-      "payId": "849201948",
+      "payId": "alberto28492228@gmail.com",
       "email": "pagos.albertozapatos@gmail.com"
     },
     "zelle": {

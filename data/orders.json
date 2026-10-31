@@ -1,5 +1,56 @@
 [
   {
+    "id": "ord_1793475107882_jnqzr",
+    "orderNumber": "ALB-2671",
+    "createdAt": "2026-10-31T19:31:47.882Z",
+    "customer": {
+      "name": "sadasd",
+      "phone": "sadasdas",
+      "idNumber": "sadasdas",
+      "city": "asdasdas",
+      "address": "asdasas",
+      "notes": "asdsadas"
+    },
+    "items": [
+      {
+        "productId": "super-star-05e94ac9-d37",
+        "name": "SUPER STAR",
+        "brand": "Adidas",
+        "image": "https://assets.olaclick.app/companies/products/images/800/05e94ac9-d374-4821-bc6e-6a838978de2d.jpeg",
+        "size": 36,
+        "price": 50,
+        "quantity": 1
+      }
+    ],
+    "totalAmount": 50,
+    "paymentPreference": "credit",
+    "status": "pending_confirmation",
+    "isCredit": true,
+    "creditPlan": {
+      "frequency": "quincenal",
+      "totalInstallments": 2,
+      "installments": [
+        {
+          "id": "inst_1_1793475107882",
+          "number": 1,
+          "totalInstallments": 2,
+          "amount": 25,
+          "dueDate": "2026-11-15",
+          "status": "pending"
+        },
+        {
+          "id": "inst_2_1793475107882",
+          "number": 2,
+          "totalInstallments": 2,
+          "amount": 25,
+          "dueDate": "2026-11-30",
+          "status": "pending"
+        }
+      ],
+      "notes": "Crédito quincenal acordado vía web"
+    }
+  },
+  {
     "id": "ord_1793469321234_zoskw",
     "orderNumber": "ALB-5826",
     "createdAt": "2026-10-31T17:55:21.234Z",

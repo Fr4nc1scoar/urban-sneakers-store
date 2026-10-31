@@ -166,7 +166,7 @@ export default function CartDrawer({
                   <span>¿Prefieres a Crédito?</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-white font-bold">2 cuotas de ${installmentAmount}</span>
+                  <span className="text-white font-bold">Cuotas quincenales a acordar</span>
                 </div>
               </div>
 
@@ -190,7 +190,7 @@ export default function CartDrawer({
 
               <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
                 <Shield className="w-3.5 h-3.5 text-slate-400" />
-                <span>Pedido respaldado y enviado directo al WhatsApp de Alberto</span>
+                <span>Pedido respaldado y enviado directo al WhatsApp del vendedor</span>
               </div>
             </div>
           )}

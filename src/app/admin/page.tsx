@@ -18,7 +18,6 @@ import {
   AlertCircle,
   CreditCard,
   MessageCircle,
-  ExternalLink,
   Sliders,
   DollarSign,
   Calendar,
@@ -28,6 +27,12 @@ import {
   Check,
   Eye,
   Trash2,
+  Lock,
+  Unlock,
+  KeyRound,
+  TrendingUp,
+  Tag,
+  Zap,
 } from 'lucide-react';
 import AdminInstallmentModal from '@/components/AdminInstallmentModal';
 
@@ -48,6 +53,13 @@ function formatDateTime(dateStr: string): string {
 }
 
 export default function AdminPage() {
+  // Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [passwordInput, setPasswordInput] = useState<string>('');
+  const [authError, setAuthError] = useState<string>('');
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
+
+  // Data States
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [settings, setSettings] = useState<StoreSettings | null>(null);
@@ -62,6 +74,19 @@ export default function AdminPage() {
   const [productBrandFilter, setProductBrandFilter] = useState('all');
   const [productSearch, setProductSearch] = useState('');
 
+  // Pricing Rule Suite States
+  const [showBulkPricingModal, setShowBulkPricingModal] = useState(false);
+  const [bulkRuleType, setBulkRuleType] = useState<'all' | 'brand' | 'margin'>('all');
+  const [bulkPriceValue, setBulkPriceValue] = useState<number>(50);
+  const [bulkBrandValue, setBulkBrandValue] = useState<string>('Nike');
+  const [bulkMarginValue, setBulkMarginValue] = useState<number>(25);
+  const [isApplyingBulkPrice, setIsApplyingBulkPrice] = useState(false);
+  const [bulkSuccessMessage, setBulkSuccessMessage] = useState<string | null>(null);
+
+  // Quick edit single product price tracking
+  const [editingPrices, setEditingPrices] = useState<Record<string, number>>({});
+  const [savedPriceId, setSavedPriceId] = useState<string | null>(null);
+
   // Sync state
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
@@ -73,6 +98,34 @@ export default function AdminPage() {
   const [settingsForm, setSettingsForm] = useState<StoreSettings | null>(null);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [settingsSuccess, setSettingsSuccess] = useState(false);
+
+  // Check auth on load
+  useEffect(() => {
+    const saved = sessionStorage.getItem('admin_unlocked');
+    if (saved === 'true') {
+      setIsAuthenticated(true);
+    }
+    setIsCheckingAuth(false);
+  }, []);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError('');
+    // Default PIN: alberto2026 or admin123
+    const validPins = ['alberto2026', 'admin123', '584248057420'];
+    if (validPins.includes(passwordInput.trim().toLowerCase())) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('admin_unlocked', 'true');
+    } else {
+      setAuthError('Contraseña incorrecta. Intenta nuevamente.');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('admin_unlocked');
+    setPasswordInput('');
+  };
 
   // Fetch all data
   const fetchData = async () => {
@@ -98,8 +151,10 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (isAuthenticated) {
+      fetchData();
+    }
+  }, [isAuthenticated]);
 
   // Handle Sync from loading-stylee.ola.click
   const handleTriggerSync = async () => {
@@ -123,6 +178,68 @@ export default function AdminPage() {
     } finally {
       setIsSyncing(false);
       setTimeout(() => setSyncMessage(null), 5000);
+    }
+  };
+
+  // Handle Bulk Pricing Rule Application
+  const handleApplyBulkPricing = async () => {
+    setIsApplyingBulkPrice(true);
+    setBulkSuccessMessage(null);
+    try {
+      const payload: any = {
+        bulkUpdate: {
+          rule: bulkRuleType,
+          targetPrice: bulkPriceValue,
+          targetBrand: bulkBrandValue,
+          marginAmount: bulkMarginValue,
+        },
+      };
+
+      const res = await fetch('/api/products', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setBulkSuccessMessage(`¡Precios aplicados con éxito! (${data.count} productos modificados).`);
+        await fetchData();
+        setTimeout(() => {
+          setShowBulkPricingModal(false);
+          setBulkSuccessMessage(null);
+        }, 2000);
+      } else {
+        alert(data.error || 'Error al aplicar regla de precios');
+      }
+    } catch (err: any) {
+      alert(`Error: ${err.message}`);
+    } finally {
+      setIsApplyingBulkPrice(false);
+    }
+  };
+
+  // Handle quick single product price change
+  const handleSaveSinglePrice = async (productId: string) => {
+    const newPrice = editingPrices[productId];
+    if (newPrice === undefined || isNaN(newPrice) || newPrice <= 0) return;
+
+    try {
+      const res = await fetch('/api/products', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: productId, price: newPrice }),
+      });
+
+      if (res.ok) {
+        setProducts(prev =>
+          prev.map(p => (p.id === productId ? { ...p, price: newPrice } : p))
+        );
+        setSavedPriceId(productId);
+        setTimeout(() => setSavedPriceId(null), 2000);
+      }
+    } catch (err) {
+      console.error('Error saving single price', err);
     }
   };
 
@@ -231,19 +348,15 @@ export default function AdminPage() {
   // Metrics
   const totalOrdersCount = orders.length;
   const pendingOrdersCount = orders.filter(o => o.status === 'pending_confirmation').length;
-  const totalRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
 
   // Credit metrics
   let totalInCredit = 0;
-  let totalCollectedCredit = 0;
   let overdueInstallmentsCount = 0;
 
   orders.forEach(o => {
     if (o.isCredit && o.creditPlan?.installments) {
       o.creditPlan.installments.forEach(inst => {
-        if (inst.status === 'paid') {
-          totalCollectedCredit += inst.amount;
-        } else {
+        if (inst.status !== 'paid') {
           totalInCredit += inst.amount;
           if (new Date(inst.dueDate) < new Date() || inst.status === 'overdue') {
             overdueInstallmentsCount++;
@@ -284,6 +397,69 @@ export default function AdminPage() {
   // Distinct brands
   const brands = Array.from(new Set(products.map(p => p.brand))).filter(Boolean);
 
+  // If loading session check
+  if (isCheckingAuth) {
+    return <div className="min-h-screen bg-[#08090e] flex items-center justify-center text-white">Cargando...</div>;
+  }
+
+  // LOGIN LOCK SCREEN (If not authenticated)
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#08090e] flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-[#10121d] border border-slate-800 rounded-3xl p-8 shadow-2xl text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-rose-600/20 border border-rose-500/30 text-rose-500 flex items-center justify-center mx-auto shadow-lg shadow-rose-600/20">
+            <Lock className="w-8 h-8" />
+          </div>
+
+          <div>
+            <h1 className="text-2xl font-black text-white">Panel Administrativo</h1>
+            <p className="text-xs text-slate-400 mt-1">
+              Ingresa la clave de acceso para gestionar pedidos y precios
+            </p>
+          </div>
+
+          {authError && (
+            <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-semibold">
+              {authError}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="relative">
+              <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="password"
+                required
+                autoFocus
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                placeholder="Ingresa tu clave de acceso..."
+                className="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3.5 px-4 rounded-xl font-bold text-xs text-white glass-button-glow flex items-center justify-center gap-2 transition-all"
+            >
+              <Unlock className="w-4 h-4" />
+              <span>Ingresar al Panel</span>
+            </button>
+          </form>
+
+          <div className="pt-2 border-t border-slate-800/80">
+            <Link
+              href="/"
+              className="text-xs text-slate-400 hover:text-white transition-colors"
+            >
+              Volver a la tienda pública
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#08090e] text-slate-100 flex flex-col">
       {/* Top Admin Bar */}
@@ -306,17 +482,17 @@ export default function AdminPage() {
                 <h1 className="text-base font-black text-white flex items-center gap-2">
                   <span>PANEL DE CONTROL</span>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-400 border border-rose-500/30">
-                    ALBERTO
+                    ADMIN
                   </span>
                 </h1>
                 <p className="text-xs text-slate-400">
-                  Gestión de Pedidos, Crédito Quincenal y Sincronización
+                  Gestión de Pedidos, Créditos Quincenales y Precios
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Sync & Settings Quick Action */}
+          {/* Sync & Logout Action */}
           <div className="flex items-center gap-2.5">
             <button
               onClick={handleTriggerSync}
@@ -328,6 +504,14 @@ export default function AdminPage() {
               <span className="hidden sm:inline">
                 {isSyncing ? 'Sincronizando...' : 'Sincronizar Catálogo'}
               </span>
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-rose-400 border border-slate-800 transition-colors"
+              title="Cerrar sesión de administrador"
+            >
+              <Lock className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -425,7 +609,7 @@ export default function AdminPage() {
             }`}
           >
             <Flame className="w-4 h-4" />
-            <span>Inventario de Zapatos ({products.length})</span>
+            <span>Inventario & Asignar Precios ({products.length})</span>
           </button>
 
           <button
@@ -437,7 +621,7 @@ export default function AdminPage() {
             }`}
           >
             <Sliders className="w-4 h-4" />
-            <span>Ajustes & WhatsApp Dueño</span>
+            <span>Ajustes & Contacto Vendedor</span>
           </button>
         </div>
 
@@ -552,31 +736,31 @@ export default function AdminPage() {
                             }`}
                           >
                             <option value="pending_confirmation" className="bg-slate-900 text-amber-300">
-                              ⏳ Pendiente Confirmación
+                              Pendiente Confirmación
                             </option>
                             <option value="confirmed" className="bg-slate-900 text-blue-300">
-                              🔵 Confirmado
+                              Confirmado
                             </option>
                             <option value="in_delivery" className="bg-slate-900 text-purple-300">
-                              🚚 En Entrega
+                              En Entrega
                             </option>
                             <option value="completed" className="bg-slate-900 text-emerald-300">
-                              ✅ Completado / Entregado
+                              Completado / Entregado
                             </option>
                             <option value="cancelled" className="bg-slate-900 text-rose-300">
-                              ❌ Cancelado
+                              Cancelado
                             </option>
                           </select>
 
                           {/* Payment tag */}
                           <span className="text-xs font-semibold px-2.5 py-0.5 rounded-lg bg-slate-800 text-slate-300">
                             {order.paymentPreference === 'credit'
-                              ? '💳 A Crédito'
+                              ? 'A Crédito'
                               : order.paymentPreference === 'pago_movil'
-                              ? '📲 Pago Móvil'
+                              ? 'Pago Móvil'
                               : order.paymentPreference === 'cash'
-                              ? '💵 Efectivo'
-                              : '🟡 Binance'}
+                              ? 'Efectivo'
+                              : 'Binance'}
                           </span>
                         </div>
 
@@ -600,6 +784,11 @@ export default function AdminPage() {
                             <span className="text-slate-500">Ciudad/Dir: </span>
                             <span>{order.customer.city} ({order.customer.address})</span>
                           </div>
+                          {order.customer.notes && (
+                            <div className="w-full text-slate-400 italic">
+                              Notas: &quot;{order.customer.notes}&quot;
+                            </div>
+                          )}
                         </div>
 
                         {/* Shoe items thumbnails and sizes */}
@@ -655,9 +844,9 @@ export default function AdminPage() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          {/* Direct WhatsApp button to chat with customer */}
+                          {/* Direct WhatsApp button to chat with customer (CLEAN FORMAT NO EMOJIS) */}
                           <a
-                            href={`https://api.whatsapp.com/send?phone=${order.customer.phone.replace(/\D/g, '')}&text=${encodeURIComponent(`Hola ${order.customer.name}! Te escribo de Alberto Shoes sobre tu pedido ${order.orderNumber}.`)}`}
+                            href={`https://api.whatsapp.com/send?phone=${order.customer.phone.replace(/\D/g, '')}&text=${encodeURIComponent(`Hola ${order.customer.name}! Te escribo sobre tu pedido ${order.orderNumber}.`)}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30 transition-all"
@@ -693,11 +882,12 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* TAB 2: PRODUCTS INVENTORY */}
+        {/* TAB 2: PRODUCTS INVENTORY & PRICING SUITE */}
         {activeTab === 'products' && (
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1">
+            {/* Top Toolbar: Search, Brands & Bulk Pricing Launcher */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1">
                 <button
                   onClick={() => setProductBrandFilter('all')}
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
@@ -706,7 +896,7 @@ export default function AdminPage() {
                       : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
                   }`}
                 >
-                  Todas las Marcas ({products.length})
+                  Todas ({products.length})
                 </button>
                 {brands.slice(0, 6).map((b) => (
                   <button
@@ -723,57 +913,97 @@ export default function AdminPage() {
                 ))}
               </div>
 
-              <div className="w-full sm:w-64 relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={productSearch}
-                  onChange={(e) => setProductSearch(e.target.value)}
-                  placeholder="Buscar zapato en inventario..."
-                  className="w-full pl-9 pr-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none"
-                />
+              <div className="flex items-center gap-2.5 w-full md:w-auto">
+                <div className="w-full sm:w-60 relative">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={productSearch}
+                    onChange={(e) => setProductSearch(e.target.value)}
+                    placeholder="Buscar zapato..."
+                    className="w-full pl-9 pr-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none"
+                  />
+                </div>
+
+                {/* Bulk Pricing Suite Button */}
+                <button
+                  onClick={() => setShowBulkPricingModal(true)}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 flex items-center gap-1.5 whitespace-nowrap shadow-lg shadow-amber-500/20 transition-all"
+                  title="Aplicar reglas de precios masivas"
+                >
+                  <Tag className="w-3.5 h-3.5" />
+                  <span>Reglas de Precios Masivos</span>
+                </button>
               </div>
             </div>
 
-            {/* Products grid */}
+            {/* Products grid with inline editable prices */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {filteredProducts.slice(0, 50).map((prod) => (
-                <div
-                  key={prod.id}
-                  className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between"
-                >
-                  <div className="aspect-square w-full rounded-xl overflow-hidden bg-slate-950 mb-2 relative">
-                    <img
-                      src={prod.image}
-                      alt={prod.name}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-bold bg-black/70 text-rose-400">
-                      {prod.brand}
-                    </span>
-                  </div>
+              {filteredProducts.slice(0, 60).map((prod) => {
+                const currentEditPrice = editingPrices[prod.id] !== undefined ? editingPrices[prod.id] : prod.price;
+                const isSaved = savedPriceId === prod.id;
 
-                  <div>
-                    <h4 className="font-bold text-xs text-white truncate" title={prod.name}>
-                      {prod.name}
-                    </h4>
-                    <p className="text-[10px] text-slate-400 line-clamp-1 mt-0.5">
-                      {prod.sizes.join(', ')}
-                    </p>
+                return (
+                  <div
+                    key={prod.id}
+                    className="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 flex flex-col justify-between transition-all"
+                  >
+                    <div className="aspect-square w-full rounded-xl overflow-hidden bg-slate-950 mb-2.5 relative">
+                      <img
+                        src={prod.image}
+                        alt={prod.name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-extrabold bg-black/80 text-rose-400">
+                        {prod.brand}
+                      </span>
+                    </div>
 
-                    <div className="mt-2 flex items-center justify-between">
-                      <span className="font-black text-sm text-white">${prod.price}</span>
-                      <span className="text-[10px] text-slate-500">Orig: ${prod.originalPrice || 25}</span>
+                    <div>
+                      <h4 className="font-bold text-xs text-white truncate" title={prod.name}>
+                        {prod.name}
+                      </h4>
+                      <p className="text-[10px] text-slate-400 line-clamp-1 mt-0.5">
+                        Tallas: {prod.sizes.join(', ')}
+                      </p>
+
+                      {/* Interactive Price Modifier */}
+                      <div className="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between gap-1.5">
+                        <div className="flex items-center gap-1 bg-slate-950 border border-slate-700/80 rounded-lg px-2 py-1 flex-1">
+                          <span className="text-xs text-slate-400 font-bold">$</span>
+                          <input
+                            type="number"
+                            min="1"
+                            value={currentEditPrice}
+                            onChange={(e) =>
+                              setEditingPrices({ ...editingPrices, [prod.id]: Number(e.target.value) })
+                            }
+                            className="w-full bg-transparent text-xs font-black text-white focus:outline-none"
+                          />
+                        </div>
+
+                        <button
+                          onClick={() => handleSaveSinglePrice(prod.id)}
+                          className={`p-1.5 rounded-lg text-xs font-bold transition-all ${
+                            isSaved
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white'
+                          }`}
+                          title="Guardar precio para este zapato"
+                        >
+                          {isSaved ? <Check className="w-3.5 h-3.5" /> : <Save className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
-            {filteredProducts.length > 50 && (
+            {filteredProducts.length > 60 && (
               <p className="text-xs text-center text-slate-500">
-                Mostrando los primeros 50 de {filteredProducts.length} zapatos. Usa el buscador para filtrar.
+                Mostrando los primeros 60 de {filteredProducts.length} zapatos. Usa el buscador o filtro de marcas para ubicar cualquier modelo específico.
               </p>
             )}
           </div>
@@ -812,7 +1042,7 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1">
-                    Número de WhatsApp del Dueño (Para recibir pedidos)
+                    Número de WhatsApp del Vendedor (Para recibir pedidos)
                   </label>
                   <input
                     type="text"
@@ -830,7 +1060,7 @@ export default function AdminPage() {
 
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1">
-                    Precio Base de Todos los Zapatos ($ USD)
+                    Precio Base Inicial de Nuevos Zapatos ($ USD)
                   </label>
                   <input
                     type="number"
@@ -843,9 +1073,6 @@ export default function AdminPage() {
                     }
                     className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white"
                   />
-                  <span className="text-[10px] text-slate-500 mt-1 block">
-                    Actualmente configurado a $50 como solicitaste.
-                  </span>
                 </div>
               </div>
 
@@ -956,6 +1183,168 @@ export default function AdminPage() {
           </form>
         )}
       </main>
+
+      {/* Bulk Pricing Modal */}
+      {showBulkPricingModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+          <div
+            className="relative w-full max-w-lg bg-[#11131f] border border-slate-700 rounded-3xl p-6 md:p-8 text-white shadow-2xl space-y-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400">
+                  <Tag className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white">Reglas de Precios Masivos</h3>
+                  <p className="text-xs text-slate-400">Aplica precios automáticos a grupos de zapatos</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowBulkPricingModal(false)}
+                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {bulkSuccessMessage && (
+              <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>{bulkSuccessMessage}</span>
+              </div>
+            )}
+
+            <div className="space-y-4 text-xs">
+              <div>
+                <label className="block text-slate-300 font-bold uppercase tracking-wider mb-2">
+                  Selecciona la Regla:
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setBulkRuleType('all')}
+                    className={`p-2.5 rounded-xl font-bold border text-center transition-all ${
+                      bulkRuleType === 'all'
+                        ? 'bg-rose-600 text-white border-rose-500'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    A Todo el Catálogo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBulkRuleType('brand')}
+                    className={`p-2.5 rounded-xl font-bold border text-center transition-all ${
+                      bulkRuleType === 'brand'
+                        ? 'bg-rose-600 text-white border-rose-500'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Por Marca
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBulkRuleType('margin')}
+                    className={`p-2.5 rounded-xl font-bold border text-center transition-all ${
+                      bulkRuleType === 'margin'
+                        ? 'bg-rose-600 text-white border-rose-500'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Margen de Ganancia
+                  </button>
+                </div>
+              </div>
+
+              {bulkRuleType === 'all' && (
+                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                  <label className="block text-slate-300 font-bold">
+                    Precio fijo para todos los zapatos ($ USD):
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={bulkPriceValue}
+                    onChange={(e) => setBulkPriceValue(Number(e.target.value))}
+                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-base font-black text-white"
+                  />
+                  <p className="text-[11px] text-slate-400">
+                    Se actualizarán todos los {products.length} productos con este precio de venta.
+                  </p>
+                </div>
+              )}
+
+              {bulkRuleType === 'brand' && (
+                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                  <div>
+                    <label className="block text-slate-300 font-bold mb-1">Selecciona la Marca:</label>
+                    <select
+                      value={bulkBrandValue}
+                      onChange={(e) => setBulkBrandValue(e.target.value)}
+                      className="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white"
+                    >
+                      {brands.map((b) => (
+                        <option key={b} value={b}>
+                          {b}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 font-bold mb-1">Precio para esta marca ($ USD):</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={bulkPriceValue}
+                      onChange={(e) => setBulkPriceValue(Number(e.target.value))}
+                      className="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-base font-black text-white"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {bulkRuleType === 'margin' && (
+                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                  <label className="block text-slate-300 font-bold">
+                    Ganancia a sumar al costo del proveedor ($ USD):
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={bulkMarginValue}
+                    onChange={(e) => setBulkMarginValue(Number(e.target.value))}
+                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-base font-black text-white"
+                  />
+                  <p className="text-[11px] text-slate-400">
+                    Ejemplo: Si un zapato cuesta $25 al mayor y pones $25 de margen, su precio final será $50.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setShowBulkPricingModal(false)}
+                className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={isApplyingBulkPrice}
+                onClick={handleApplyBulkPricing}
+                className="px-6 py-2.5 rounded-xl text-xs font-bold text-white glass-button-glow flex items-center gap-2"
+              >
+                <Zap className="w-4 h-4" />
+                <span>{isApplyingBulkPrice ? 'Aplicando Precios...' : 'Aplicar Precios Masivos'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Credit installments modal */}
       {selectedOrderForCredit && settings && (

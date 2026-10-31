@@ -40,7 +40,7 @@ export function generateOrderWhatsAppMessage(order: Order, settings: StoreSettin
 
   const paymentText =
     order.paymentPreference === 'credit'
-      ? '*SOLICITUD DE COMPRA A CREDITO* (2 cuotas quincenales / sujeto a confirmacion)'
+      ? '*SOLICITUD DE COMPRA A CREDITO* (Cuotas quincenales a acordar con el vendedor)'
       : order.paymentPreference === 'pago_movil'
       ? 'Pago Movil'
       : order.paymentPreference === 'binance'

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Flame, CreditCard, Truck, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Flame, CreditCard, Truck, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
 
 interface HeroBannerProps {
   onExploreClick: () => void;
@@ -25,7 +25,7 @@ export default function HeroBanner({
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold tracking-wide uppercase mb-6 backdrop-blur-md">
             <Flame className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
-            <span>Colección Urbana 2026 // Stock Sincronizado</span>
+            <span>Colección Urbana 2026 // Stock en Vivo</span>
           </div>
 
           {/* Main Title */}
@@ -38,7 +38,7 @@ export default function HeroBanner({
 
           {/* Description */}
           <p className="text-base sm:text-lg text-slate-300 font-normal leading-relaxed mb-8 max-w-2xl mx-auto">
-            Descubre los calzados más buscados: <strong className="text-white">Nike, Jordan, Adidas, New Balance, McQueen</strong> y más. Todos a un precio único de <strong className="text-rose-400">$50 USD</strong>. Llévatelos de contado o difiérelo en <strong className="text-white">2 cuotas quincenales</strong> sin trabas.
+            Descubre los calzados más buscados: <strong className="text-white">Nike, Jordan, Adidas, New Balance, McQueen</strong> y más. Llévatelos de contado o <strong className="text-rose-400">adquiérelos en 2 o más cuotas quincenales</strong> acordadas directamente con el vendedor.
           </p>
 
           {/* CTA Buttons */}
@@ -64,18 +64,18 @@ export default function HeroBanner({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-left">
             <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
               <div className="flex items-center gap-2.5 mb-1 text-rose-400">
-                <CheckCircle2 className="w-4 h-4" />
-                <span className="text-xs font-bold text-white uppercase tracking-wider">Precio Único</span>
+                <Sparkles className="w-4 h-4" />
+                <span className="text-xs font-bold text-white uppercase tracking-wider">Calidad Premium</span>
               </div>
-              <p className="text-xs text-slate-400">Todos los modelos a solo $50</p>
+              <p className="text-xs text-slate-400">Modelos exclusivos y en tendencia</p>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
               <div className="flex items-center gap-2.5 mb-1 text-amber-400">
                 <CreditCard className="w-4 h-4" />
-                <span className="text-xs font-bold text-white uppercase tracking-wider">2 Cuotas</span>
+                <span className="text-xs font-bold text-white uppercase tracking-wider">2 o Más Cuotas</span>
               </div>
-              <p className="text-xs text-slate-400">Pagos quincenales de $25</p>
+              <p className="text-xs text-slate-400">Pagos quincenales a acordar</p>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
@@ -83,7 +83,7 @@ export default function HeroBanner({
                 <Truck className="w-4 h-4" />
                 <span className="text-xs font-bold text-white uppercase tracking-wider">Envíos Directos</span>
               </div>
-              <p className="text-xs text-slate-400">A toda Venezuela o entregas</p>
+              <p className="text-xs text-slate-400">Envíos o entregas personales</p>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
@@ -91,7 +91,7 @@ export default function HeroBanner({
                 <Flame className="w-4 h-4" />
                 <span className="text-xs font-bold text-white uppercase tracking-wider">Stock en Vivo</span>
               </div>
-              <p className="text-xs text-slate-400">Tallas reales sincronizadas</p>
+              <p className="text-xs text-slate-400">Tallas reales disponibles</p>
             </div>
           </div>
         </div>

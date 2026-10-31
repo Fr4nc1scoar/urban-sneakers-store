@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ShoppingBag, Search, Shield, MessageCircle, Sparkles } from 'lucide-react';
+import { ShoppingBag, Search, MessageCircle, Sparkles } from 'lucide-react';
 
 interface NavbarProps {
   cartCount: number;
@@ -10,6 +10,7 @@ interface NavbarProps {
   searchQuery: string;
   onSearchChange: (q: string) => void;
   ownerPhone?: string;
+  storeName?: string;
 }
 
 export default function Navbar({
@@ -18,27 +19,28 @@ export default function Navbar({
   searchQuery,
   onSearchChange,
   ownerPhone = '584248057420',
+  storeName = 'Urban Sneakers',
 }: NavbarProps) {
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-[#090a0f]/90 border-b border-white/[0.08]">
       {/* Top micro-announcement banner */}
       <div className="bg-gradient-to-r from-rose-600 via-rose-500 to-amber-600 text-white text-xs font-medium py-1.5 px-4 text-center flex items-center justify-center gap-2">
         <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-        <span>¡Lanza tu estilo hoy! Todos los zapatos en <strong>$50</strong> — Paga de contado o llévatelos <strong>a crédito en 2 cuotas quincenales</strong></span>
+        <span>¡Lanza tu estilo hoy! Calzados exclusivos — Paga de contado o llévatelos <strong>a crédito en cuotas quincenales</strong></span>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-500 to-rose-700 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-rose-500/30 group-hover:scale-105 transition-transform">
-            A
+            ⚡
           </div>
           <div className="flex flex-col">
             <span className="font-extrabold tracking-wider text-xl uppercase bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-              ALBERTO <span className="text-rose-500">SHOES</span>
+              URBAN <span className="text-rose-500">SNEAKERS</span>
             </span>
             <span className="text-[10px] tracking-widest text-slate-400 uppercase font-semibold">
-              Sneakers & Venta a Crédito
+              Calzado Exclusivo & Crédito
             </span>
           </div>
         </Link>
@@ -61,26 +63,16 @@ export default function Navbar({
         <div className="flex items-center gap-3">
           {/* Direct WhatsApp Contact Button */}
           <a
-            href={`https://api.whatsapp.com/send?phone=${ownerPhone}&text=${encodeURIComponent('Hola Alberto! Vengo de tu página web y tengo una consulta sobre los zapatos.')}`}
+            href={`https://api.whatsapp.com/send?phone=${ownerPhone}&text=${encodeURIComponent('Hola! Vengo de la tienda en línea y tengo una consulta sobre los zapatos disponibles.')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-all"
-            title="Escribir a Alberto por WhatsApp"
+            title="Escribir al WhatsApp del vendedor"
           >
             <MessageCircle className="w-4 h-4 text-emerald-400" />
             <span className="hidden lg:inline">+58 424-8057420</span>
             <span className="lg:hidden">WhatsApp</span>
           </a>
-
-          {/* Admin link */}
-          <Link
-            href="/admin"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 border border-slate-700/40 transition-all"
-            title="Panel de Administración y Cuotas"
-          >
-            <Shield className="w-3.5 h-3.5 text-rose-400" />
-            <span className="hidden sm:inline">Admin</span>
-          </Link>
 
           {/* Cart Button */}
           <button

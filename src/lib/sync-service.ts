@@ -122,7 +122,12 @@ export async function fetchAndSyncCatalog(
     let updatedCount = 0;
 
     for (const section of sections) {
-      const sectionName = section.name || 'Zapatos';
+      let sectionName = (section.name || 'Sneakers').trim();
+      if (sectionName.includes('20') || sectionName.toLowerCase().includes('promoc') || sectionName.includes('$')) {
+        sectionName = 'Edición Especial';
+      } else if (sectionName === 'Catálogo' || sectionName === 'Zapatos') {
+        sectionName = 'Sneakers';
+      }
       const items = section.hasMenuItem || [];
 
       for (const item of items) {

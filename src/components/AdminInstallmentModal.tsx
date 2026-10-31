@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Order, Installment, StoreSettings } from '@/types';
-import { X, Calendar, DollarSign, MessageCircle, CheckCircle2, Clock, AlertTriangle, Save, Sparkles } from 'lucide-react';
+import { X, Calendar, DollarSign, MessageCircle, Save, Plus, Trash2, Zap, RefreshCw } from 'lucide-react';
 
 interface AdminInstallmentModalProps {
   order: Order | null;
@@ -50,29 +50,30 @@ export default function AdminInstallmentModal({
         status: 'pending' as const,
       },
     ],
-    notes: 'Plan acordado a 2 cuotas quincenales',
+    notes: 'Plan acordado en cuotas quincenales',
   };
 
   const [installments, setInstallments] = useState<Installment[]>(currentPlan.installments);
-  const [numInstallments, setNumInstallments] = useState(currentPlan.totalInstallments || 2);
+  const [customCountInput, setCustomCountInput] = useState<number>(currentPlan.totalInstallments || 2);
   const [notes, setNotes] = useState(currentPlan.notes || '');
   const [saving, setSaving] = useState(false);
 
-  // Recalculate installments equally
+  // Recalculate installments equally based on any count
   const handleSetEqualSplits = (count: number) => {
-    setNumInstallments(count);
-    const amountPer = Math.floor(order.totalAmount / count);
-    const remainder = order.totalAmount - amountPer * count;
+    const validCount = Math.max(1, Math.min(count, 12));
+    setCustomCountInput(validCount);
+    const amountPer = Math.floor(order.totalAmount / validCount);
+    const remainder = order.totalAmount - amountPer * validCount;
 
     const newInst: Installment[] = [];
     const baseTime = new Date(order.createdAt).getTime();
 
-    for (let i = 1; i <= count; i++) {
+    for (let i = 1; i <= validCount; i++) {
       const dueDate = new Date(baseTime + i * 15 * 86400000).toISOString().split('T')[0];
       newInst.push({
-        id: `inst_${i}_${Date.now()}`,
+        id: `inst_${i}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
         number: i,
-        totalInstallments: count,
+        totalInstallments: validCount,
         amount: i === 1 ? amountPer + remainder : amountPer,
         dueDate,
         status: 'pending',
@@ -85,6 +86,44 @@ export default function AdminInstallmentModal({
     const updated = [...installments];
     updated[index] = { ...updated[index], [field]: value };
     setInstallments(updated);
+  };
+
+  const handleAddManualCuota = () => {
+    const nextNumber = installments.length + 1;
+    const lastDate = installments.length > 0
+      ? new Date(installments[installments.length - 1].dueDate).getTime()
+      : Date.now();
+    const newDueDate = new Date(lastDate + 15 * 86400000).toISOString().split('T')[0];
+
+    const newInst: Installment = {
+      id: `inst_manual_${Date.now()}`,
+      number: nextNumber,
+      totalInstallments: nextNumber,
+      amount: 0,
+      dueDate: newDueDate,
+      status: 'pending',
+    };
+
+    const updated = [...installments, newInst].map((item, idx, arr) => ({
+      ...item,
+      number: idx + 1,
+      totalInstallments: arr.length,
+    }));
+
+    setInstallments(updated);
+    setCustomCountInput(updated.length);
+  };
+
+  const handleRemoveCuota = (index: number) => {
+    if (installments.length <= 1) return;
+    const filtered = installments.filter((_, idx) => idx !== index);
+    const updated = filtered.map((item, idx, arr) => ({
+      ...item,
+      number: idx + 1,
+      totalInstallments: arr.length,
+    }));
+    setInstallments(updated);
+    setCustomCountInput(updated.length);
   };
 
   const handleSaveAll = async () => {
@@ -134,153 +173,206 @@ export default function AdminInstallmentModal({
         </div>
 
         {/* Quick config bar */}
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span className="text-xs text-slate-400 block mb-1">Monto Total del Pedido:</span>
             <span className="text-2xl font-black text-white">${order.totalAmount} USD</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-slate-400 font-semibold">Dividir en:</span>
             <button
               type="button"
               onClick={() => handleSetEqualSplits(2)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 installments.length === 2
-                  ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/30'
                   : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
               }`}
             >
-              2 Cuotas (50% y 50%)
+              2 Cuotas
             </button>
             <button
               type="button"
               onClick={() => handleSetEqualSplits(3)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 installments.length === 3
-                  ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/30'
                   : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
               }`}
             >
               3 Cuotas
             </button>
+            <button
+              type="button"
+              onClick={() => handleSetEqualSplits(4)}
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                installments.length === 4
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/30'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              4 Cuotas
+            </button>
+
+            {/* Custom installments number input */}
+            <div className="flex items-center gap-1 bg-slate-950 border border-slate-700 rounded-xl px-2 py-1">
+              <input
+                type="number"
+                min="1"
+                max="12"
+                value={customCountInput}
+                onChange={(e) => setCustomCountInput(Number(e.target.value))}
+                className="w-10 bg-transparent text-xs font-black text-white text-center focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => handleSetEqualSplits(customCountInput)}
+                className="px-2 py-0.5 rounded-lg bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 font-bold text-[10px] transition-colors"
+                title="Generar división equitativa"
+              >
+                Aplicar
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Installment Cards */}
         <div className="space-y-4 mb-6">
-          <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
-            Detalle de Cuotas Quincenales
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+              Detalle de Cuotas Quincenales ({installments.length})
+            </label>
+            <button
+              type="button"
+              onClick={handleAddManualCuota}
+              className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" /> Agregar Cuota
+            </button>
+          </div>
 
-          {installments.map((inst, idx) => {
-            const isPaid = inst.status === 'paid';
-            const isOverdue = inst.status === 'overdue' || (!isPaid && new Date(inst.dueDate) < new Date());
+          <div className="max-h-72 overflow-y-auto space-y-3 pr-1">
+            {installments.map((inst, idx) => {
+              const isPaid = inst.status === 'paid';
+              const isOverdue = inst.status === 'overdue' || (!isPaid && new Date(inst.dueDate) < new Date());
 
-            return (
-              <div
-                key={inst.id || idx}
-                className={`p-4 rounded-2xl border transition-all ${
-                  isPaid
-                    ? 'bg-emerald-950/20 border-emerald-500/40'
-                    : isOverdue
-                    ? 'bg-rose-950/20 border-rose-500/40'
-                    : 'bg-slate-900/80 border-slate-800'
-                }`}
-              >
-                <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-black text-amber-400">
-                      #{inst.number}
-                    </span>
-                    <span className="font-bold text-sm text-white">
-                      Cuota {inst.number} de {installments.length}
-                    </span>
-                  </div>
+              return (
+                <div
+                  key={inst.id || idx}
+                  className={`p-4 rounded-2xl border transition-all ${
+                    isPaid
+                      ? 'bg-emerald-950/20 border-emerald-500/40'
+                      : isOverdue
+                      ? 'bg-rose-950/20 border-rose-500/40'
+                      : 'bg-slate-900/80 border-slate-800'
+                  }`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-black text-amber-400">
+                        #{inst.number}
+                      </span>
+                      <span className="font-bold text-sm text-white">
+                        Cuota {inst.number} de {installments.length}
+                      </span>
+                    </div>
 
-                  {/* Status badge and quick toggles */}
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={inst.status}
-                      onChange={(e) =>
-                        handleUpdateSingleInstallment(
-                          idx,
-                          'status',
-                          e.target.value as Installment['status']
-                        )
-                      }
-                      className={`text-xs font-bold py-1 px-2.5 rounded-xl border focus:outline-none ${
-                        isPaid
-                          ? 'bg-emerald-600/30 text-emerald-300 border-emerald-500/50'
-                          : isOverdue
-                          ? 'bg-rose-600/30 text-rose-300 border-rose-500/50'
-                          : 'bg-amber-600/30 text-amber-300 border-amber-500/50'
-                      }`}
-                    >
-                      <option value="pending" className="bg-slate-900 text-amber-300">⏳ Pendiente</option>
-                      <option value="paid" className="bg-slate-900 text-emerald-300">✅ Cobrada / Pagada</option>
-                      <option value="overdue" className="bg-slate-900 text-rose-300">⚠️ Vencida / Atrasada</option>
-                    </select>
-
-                    {/* Button to send WhatsApp payment collection reminder */}
-                    <a
-                      href={(inst as any).reminderWhatsAppUrl || `https://api.whatsapp.com/send?phone=${order.customer.phone.replace(/\D/g, '')}&text=${encodeURIComponent(`Hola ${order.customer.name}! Te escribo de Alberto Shoes para recordarte tu cuota #${inst.number} por $${inst.amount} USD.`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-1 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition-all shadow-md shadow-emerald-600/30"
-                      title="Enviar mensaje personalizado de cobro al WhatsApp del cliente"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5" />
-                      <span>Cobrar por WhatsApp</span>
-                    </a>
-                  </div>
-                </div>
-
-                {/* Editable Inputs for this installment */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                  <div>
-                    <label className="text-slate-400 block mb-1">Monto ($ USD):</label>
-                    <div className="relative">
-                      <DollarSign className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="number"
-                        value={inst.amount}
+                    {/* Status badge and quick toggles */}
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={inst.status}
                         onChange={(e) =>
-                          handleUpdateSingleInstallment(idx, 'amount', Number(e.target.value))
+                          handleUpdateSingleInstallment(
+                            idx,
+                            'status',
+                            e.target.value as Installment['status']
+                          )
                         }
-                        className="w-full pl-7 pr-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-white font-bold"
-                      />
+                        className={`text-xs font-bold py-1 px-2.5 rounded-xl border focus:outline-none ${
+                          isPaid
+                            ? 'bg-emerald-600/30 text-emerald-300 border-emerald-500/50'
+                            : isOverdue
+                            ? 'bg-rose-600/30 text-rose-300 border-rose-500/50'
+                            : 'bg-amber-600/30 text-amber-300 border-amber-500/50'
+                        }`}
+                      >
+                        <option value="pending" className="bg-slate-900 text-amber-300">Pendiente</option>
+                        <option value="paid" className="bg-slate-900 text-emerald-300">Cobrada / Pagada</option>
+                        <option value="overdue" className="bg-slate-900 text-rose-300">Vencida / Atrasada</option>
+                      </select>
+
+                      {/* Button to send WhatsApp payment collection reminder (NO EMOJIS TO PREVENT  BUG) */}
+                      <a
+                        href={(inst as any).reminderWhatsAppUrl || `https://api.whatsapp.com/send?phone=${order.customer.phone.replace(/\D/g, '')}&text=${encodeURIComponent(`Hola ${order.customer.name}! Te escribo para recordarte tu cuota #${inst.number} por $${inst.amount} USD.`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition-all shadow-md shadow-emerald-600/30"
+                        title="Enviar mensaje personalizado de cobro al WhatsApp del cliente"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        <span>Cobrar por WhatsApp</span>
+                      </a>
+
+                      {installments.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCuota(idx)}
+                          className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-slate-800 transition-colors"
+                          title="Eliminar esta cuota"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </div>
 
-                  <div>
-                    <label className="text-slate-400 block mb-1">Fecha Límite de Cobro:</label>
-                    <input
-                      type="date"
-                      value={inst.dueDate}
-                      onChange={(e) =>
-                        handleUpdateSingleInstallment(idx, 'dueDate', e.target.value)
-                      }
-                      className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-white font-medium"
-                    />
-                  </div>
+                  {/* Editable Inputs for this installment */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div>
+                      <label className="text-slate-400 block mb-1">Monto ($ USD):</label>
+                      <div className="relative">
+                        <DollarSign className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="number"
+                          value={inst.amount}
+                          onChange={(e) =>
+                            handleUpdateSingleInstallment(idx, 'amount', Number(e.target.value))
+                          }
+                          className="w-full pl-7 pr-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-white font-bold"
+                        />
+                      </div>
+                    </div>
 
-                  <div>
-                    <label className="text-slate-400 block mb-1">Método de Pago Recibido:</label>
-                    <input
-                      type="text"
-                      placeholder="Ej. Pago Móvil / Efectivo"
-                      value={inst.paymentMethod || ''}
-                      onChange={(e) =>
-                        handleUpdateSingleInstallment(idx, 'paymentMethod', e.target.value)
-                      }
-                      className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-white"
-                    />
+                    <div>
+                      <label className="text-slate-400 block mb-1">Fecha Límite (Manual):</label>
+                      <input
+                        type="date"
+                        value={inst.dueDate}
+                        onChange={(e) =>
+                          handleUpdateSingleInstallment(idx, 'dueDate', e.target.value)
+                        }
+                        className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-white font-medium"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-slate-400 block mb-1">Comprobante / Detalle:</label>
+                      <input
+                        type="text"
+                        placeholder="Ej. Pago Móvil / Divisas"
+                        value={inst.paymentMethod || ''}
+                        onChange={(e) =>
+                          handleUpdateSingleInstallment(idx, 'paymentMethod', e.target.value)
+                        }
+                        className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-white"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         {/* Sum Check */}
@@ -301,7 +393,7 @@ export default function AdminInstallmentModal({
             rows={2}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Ej. Cliente pagó $10 de inicial y el resto en 2 cuotas quincenales."
+            placeholder="Ej. Cliente acordó pagar inicial en efectivo y saldo en cuotas quincenales."
             className="w-full px-3 py-2 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-white"
           />
         </div>

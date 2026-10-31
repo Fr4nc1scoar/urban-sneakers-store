@@ -12,16 +12,14 @@ import OrderSuccessModal from '@/components/OrderSuccessModal';
 import {
   Sparkles,
   Filter,
-  CheckCircle2,
   Calendar,
-  CreditCard,
   MessageCircle,
   ShoppingBag,
   ArrowRight,
-  Truck,
   ShieldCheck,
   X,
-  HelpCircle,
+  CreditCard,
+  Zap,
 } from 'lucide-react';
 
 export default function StorefrontPage() {
@@ -47,7 +45,18 @@ export default function StorefrontPage() {
   const [whatsAppRedirectUrl, setWhatsAppRedirectUrl] = useState('');
   const [isCreditExplainerOpen, setIsCreditExplainerOpen] = useState(false);
 
+  // Interactive mouse spotlight effect
+  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
+
   const catalogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   // Load products and settings
   useEffect(() => {
@@ -180,14 +189,26 @@ export default function StorefrontPage() {
   };
 
   const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalCartAmount = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
   const scrollToCatalog = () => {
     catalogRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#08090e]">
-      {/* Navbar */}
+    <div className="min-h-screen flex flex-col bg-[#08090e] relative overflow-x-hidden">
+      {/* Interactive Eduardo-style Pointer Spotlight Glow */}
+      <div
+        className="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300 hidden md:block"
+        style={{
+          background: `radial-gradient(550px circle at ${mousePos.x}px ${mousePos.y}px, rgba(244, 63, 94, 0.06), transparent 75%)`,
+        }}
+      />
+
+      {/* Subtle Background Cyber Grid */}
+      <div className="fixed inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+
+      {/* Navbar (Admin link removed from storefront) */}
       <Navbar
         cartCount={totalCartCount}
         onOpenCart={() => setIsCartOpen(true)}
@@ -204,7 +225,7 @@ export default function StorefrontPage() {
       />
 
       {/* Catalog & Filter Section */}
-      <main ref={catalogRef} className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <main ref={catalogRef} className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 relative z-10">
         {/* Section title & Brand Pills */}
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -338,6 +359,28 @@ export default function StorefrontPage() {
         )}
       </main>
 
+      {/* Floating Action Cart Pill (Noticeable & Interactive) */}
+      {cartItems.length > 0 && (
+        <div className="fixed bottom-24 right-6 z-40">
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-600 text-white font-extrabold text-sm shadow-[0_10px_35px_rgba(244,63,94,0.55)] border border-rose-300/40 flex items-center gap-3.5 hover:scale-105 active:scale-95 transition-all group backdrop-blur-md"
+          >
+            <div className="relative">
+              <ShoppingBag className="w-5 h-5 text-white" />
+              <span className="absolute -top-2.5 -right-2.5 min-w-[20px] h-5 px-1 rounded-full bg-black text-rose-400 text-xs font-black flex items-center justify-center border border-rose-500">
+                {totalCartCount}
+              </span>
+            </div>
+            <div className="text-left flex flex-col">
+              <span className="text-xs font-black uppercase tracking-wider">Ver Carrito</span>
+              <span className="text-[11px] text-rose-100 font-semibold">${totalCartAmount} USD • En cuotas</span>
+            </div>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+      )}
+
       {/* Credit Explanation Modal */}
       {isCreditExplainerOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
@@ -360,7 +403,7 @@ export default function StorefrontPage() {
               ¿Cómo funciona la Venta a Crédito?
             </h3>
             <p className="text-xs text-slate-300 leading-relaxed mb-4">
-              En <strong>Alberto Shoes</strong> te damos facilidades para que estrenes tus zapatos favoritos pagando en cómodas cuotas quincenales:
+              Te ofrecemos facilidades para que estrenes tus zapatos favoritos pagando en cómodas cuotas quincenales:
             </p>
 
             <div className="space-y-3 mb-6 text-xs text-slate-300">
@@ -370,7 +413,7 @@ export default function StorefrontPage() {
                 </span>
                 <div>
                   <strong className="text-white block">Elige tu modelo y talla</strong>
-                  Todos los zapatos tienen un valor base de $50 USD.
+                  Selecciona los zapatos y la talla que necesitas en el catálogo.
                 </div>
               </div>
 
@@ -380,7 +423,7 @@ export default function StorefrontPage() {
                 </span>
                 <div>
                   <strong className="text-white block">Envías tu pedido por WhatsApp</strong>
-                  Al concretar con Alberto (+58 424-8057420), confirmas la disponibilidad y el acuerdo de cuotas.
+                  Al contactar con el vendedor, confirmas la disponibilidad y el acuerdo de cuotas quincenales.
                 </div>
               </div>
 
@@ -389,8 +432,8 @@ export default function StorefrontPage() {
                   3
                 </span>
                 <div>
-                  <strong className="text-white block">Pagos quincenales de $25</strong>
-                  Normalmente en 2 cuotas quincenales (o 3 según acuerdo). Recibes tu recordatorio personalizado por WhatsApp para tu comodidad.
+                  <strong className="text-white block">2 o más cuotas quincenales</strong>
+                  Acuerdas la cantidad de cuotas (generalmente 2 o 3) y recibes tu recordatorio personalizado por WhatsApp para tu comodidad.
                 </div>
               </div>
             </div>
@@ -407,11 +450,11 @@ export default function StorefrontPage() {
 
       {/* Floating WhatsApp Quick Action Button */}
       <a
-        href={`https://api.whatsapp.com/send?phone=${settings?.ownerWhatsApp || '584248057420'}&text=${encodeURIComponent('Hola Alberto! Quisiera hacerte una pregunta sobre los zapatos disponibles.')}`}
+        href={`https://api.whatsapp.com/send?phone=${settings?.ownerWhatsApp || '584248057420'}&text=${encodeURIComponent('Hola! Quisiera hacerte una pregunta sobre los zapatos disponibles.')}`}
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-40 p-4 rounded-full text-white whatsapp-glow flex items-center justify-center hover:scale-110 transition-transform shadow-2xl"
-        title="Preguntar a Alberto por WhatsApp"
+        title="Preguntar al vendedor por WhatsApp"
       >
         <MessageCircle className="w-6 h-6" />
       </a>
@@ -453,20 +496,20 @@ export default function StorefrontPage() {
         onClose={() => setIsSuccessModalOpen(false)}
       />
 
-      {/* Footer */}
-      <footer className="mt-20 border-t border-slate-800 bg-[#07080c] py-12 text-slate-400 text-xs">
+      {/* Footer (Admin link completely removed) */}
+      <footer className="mt-20 border-t border-slate-800 bg-[#07080c] py-12 text-slate-400 text-xs relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-3">
             <span className="font-black text-base text-white tracking-wider uppercase">
-              ALBERTO <span className="text-rose-500">SHOES</span>
+              URBAN <span className="text-rose-500">SNEAKERS</span>
             </span>
             <p className="text-slate-400 leading-relaxed">
-              Venta de calzado urbano, deportivo y casual de alta calidad en Venezuela. Precios accesibles y facilidad de pago a crédito en cuotas quincenales.
+              Venta de calzado urbano, deportivo y casual de alta calidad. Precios accesibles y facilidad de pago a crédito en cuotas quincenales a convenir.
             </p>
           </div>
 
           <div>
-            <h4 className="font-bold text-white uppercase tracking-wider mb-3">Atención al Cliente</h4>
+            <h4 className="font-bold text-white uppercase tracking-wider mb-3">Atención Directa</h4>
             <ul className="space-y-2">
               <li>
                 <a
@@ -477,8 +520,7 @@ export default function StorefrontPage() {
                   <span>WhatsApp: {settings?.ownerWhatsAppDisplay || '+58 424-8057420'}</span>
                 </a>
               </li>
-              <li>Envíos a nivel nacional por MRW, Zoom y Domesa</li>
-              <li>Entregas personales previo acuerdo</li>
+              <li>Envíos directos o entregas personales</li>
             </ul>
           </div>
 
@@ -489,26 +531,21 @@ export default function StorefrontPage() {
               <li>• Divisas en Efectivo ($ USD)</li>
               <li>• Binance Pay (USDT)</li>
               <li>• Zelle</li>
-              <li>• Crédito en 2 cuotas quincenales</li>
+              <li>• Crédito en cuotas quincenales</li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-white uppercase tracking-wider mb-3">Administración</h4>
-            <p className="mb-3 text-slate-400">Acceso exclusivo para el dueño de la tienda:</p>
-            <a
-              href="/admin"
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 font-semibold"
-            >
-              <ShieldCheck className="w-4 h-4 text-rose-500" />
-              <span>Panel Administrativo</span>
-            </a>
+            <h4 className="font-bold text-white uppercase tracking-wider mb-3">Garantía y Seguridad</h4>
+            <p className="leading-relaxed text-slate-400">
+              Trato directo con el vendedor sin intermediarios. Confirmación de pedido en WhatsApp y acuerdo personalizado de cuotas.
+            </p>
           </div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 pt-6 border-t border-slate-850 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-[11px]">
-          <p>© {new Date().getFullYear()} Alberto Shoes. Todos los derechos reservados.</p>
-          <p>Catálogo sincronizado en tiempo real</p>
+          <p>© {new Date().getFullYear()} Urban Sneakers. Catálogo actualizado con stock en vivo.</p>
+          <p>Tallas reales disponibles</p>
         </div>
       </footer>
     </div>

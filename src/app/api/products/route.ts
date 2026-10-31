@@ -52,9 +52,40 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id, price, inStock, featured } = body;
+    let products = await getProducts();
 
-    const products = await getProducts();
+    // 1. Bulk pricing update
+    if (body.bulkUpdate) {
+      const { rule, targetPrice, targetBrand, marginAmount } = body.bulkUpdate;
+      let modifiedCount = 0;
+
+      if (rule === 'all' && targetPrice) {
+        products = products.map(p => {
+          modifiedCount++;
+          return { ...p, price: Number(targetPrice), lastUpdated: new Date().toISOString() };
+        });
+      } else if (rule === 'brand' && targetBrand && targetPrice) {
+        products = products.map(p => {
+          if (p.brand.toLowerCase() === targetBrand.toLowerCase()) {
+            modifiedCount++;
+            return { ...p, price: Number(targetPrice), lastUpdated: new Date().toISOString() };
+          }
+          return p;
+        });
+      } else if (rule === 'margin' && marginAmount !== undefined) {
+        products = products.map(p => {
+          const baseCost = p.originalPrice || 25;
+          modifiedCount++;
+          return { ...p, price: baseCost + Number(marginAmount), lastUpdated: new Date().toISOString() };
+        });
+      }
+
+      await saveProducts(products);
+      return NextResponse.json({ success: true, count: modifiedCount, message: `Se actualizaron ${modifiedCount} productos` });
+    }
+
+    // 2. Single product update
+    const { id, price, inStock, featured } = body;
     const index = products.findIndex(p => p.id === id);
 
     if (index === -1) {

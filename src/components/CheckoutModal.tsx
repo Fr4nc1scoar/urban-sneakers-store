@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { CartItem, Order } from '@/types';
-import { X, Send, CreditCard, Sparkles, AlertCircle, ArrowLeft } from 'lucide-react';
+import { X, Send, CreditCard, Sparkles, AlertCircle, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface CheckoutModalProps {
@@ -28,7 +28,8 @@ export default function CheckoutModal({
   const [notes, setNotes] = useState('');
   const [paymentPreference, setPaymentPreference] = useState<'credit' | 'pago_movil' | 'cash' | 'binance' | 'zelle'>('credit');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [generalError, setGeneralError] = useState('');
 
   if (!isOpen) return null;
 
@@ -37,22 +38,58 @@ export default function CheckoutModal({
     0
   );
 
-  const installmentAmount = Math.round(totalAmount / 2);
+  const validateForm = (): boolean => {
+    const errs: Record<string, string> = {};
+
+    // Validate Name
+    if (!name.trim()) {
+      errs.name = 'El nombre y apellido son obligatorios.';
+    } else if (name.trim().length < 3) {
+      errs.name = 'Por favor ingresa tu nombre completo (mínimo 3 letras).';
+    }
+
+    // Validate Phone
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (!phone.trim()) {
+      errs.phone = 'El número de WhatsApp es obligatorio.';
+    } else if (cleanPhone.length < 10) {
+      errs.phone = 'Ingresa un número válido con código de área (ej. 04121234567).';
+    }
+
+    // Validate Cédula (Mandatory for credit)
+    if (paymentPreference === 'credit') {
+      const cleanId = idNumber.replace(/\D/g, '');
+      if (!idNumber.trim()) {
+        errs.idNumber = 'La cédula es requerida para solicitudes a crédito.';
+      } else if (cleanId.length < 6) {
+        errs.idNumber = 'Número de cédula inválido (mínimo 6 dígitos).';
+      }
+    }
+
+    // Validate City
+    if (!city.trim()) {
+      errs.city = 'Indica tu ciudad o estado (ej. Caracas, Valencia, Margarita).';
+    } else if (city.trim().length < 3) {
+      errs.city = 'Nombre de ciudad muy corto.';
+    }
+
+    // Validate Address
+    if (!address.trim()) {
+      errs.address = 'Indica tu dirección de entrega o punto de encuentro.';
+    } else if (address.trim().length < 5) {
+      errs.address = 'Por favor sé más específico con la dirección o entrega.';
+    }
+
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setGeneralError('');
 
-    if (!name.trim()) {
-      setError('Por favor indica tu nombre completo.');
-      return;
-    }
-    if (!phone.trim()) {
-      setError('Por favor indica tu número de teléfono / WhatsApp.');
-      return;
-    }
-    if (paymentPreference === 'credit' && !idNumber.trim()) {
-      setError('Para compras a crédito es necesario tu número de Cédula de Identidad.');
+    if (!validateForm()) {
+      setGeneralError('Por favor revisa y completa los campos señalados en rojo.');
       return;
     }
 
@@ -64,8 +101,8 @@ export default function CheckoutModal({
           name: name.trim(),
           phone: phone.trim(),
           idNumber: idNumber.trim() || undefined,
-          city: city.trim() || 'No especificada',
-          address: address.trim() || 'A convenir con Alberto',
+          city: city.trim(),
+          address: address.trim(),
           notes: notes.trim() || undefined,
         },
         items: items.map((i) => ({
@@ -92,25 +129,25 @@ export default function CheckoutModal({
         throw new Error(data.error || 'Ocurrió un error al procesar el pedido');
       }
 
-      // Celebrate with confetti
+      // Confetti celebration
       try {
         confetti({
           particleCount: 80,
           spread: 70,
           origin: { y: 0.6 },
         });
-      } catch (err) {
-        // Confetti is purely decorative
+      } catch {
+        // purely decorative
       }
 
-      // Open WhatsApp automatically
+      // Open WhatsApp direct API
       if (data.whatsAppUrl) {
         window.open(data.whatsAppUrl, '_blank');
       }
 
       onOrderSuccess(data.order, data.whatsAppUrl);
     } catch (err: any) {
-      setError(err.message || 'Error de conexión');
+      setGeneralError(err.message || 'Error de conexión');
     } finally {
       setIsSubmitting(false);
     }
@@ -134,7 +171,7 @@ export default function CheckoutModal({
             <div>
               <h2 className="text-xl font-black text-white">Finalizar Pedido</h2>
               <p className="text-xs text-slate-400">
-                Se enviará directo a WhatsApp al dueño ({ownerWhatsAppDisplay})
+                Se enviará directamente al WhatsApp del vendedor ({ownerWhatsAppDisplay})
               </p>
             </div>
           </div>
@@ -146,10 +183,10 @@ export default function CheckoutModal({
           </button>
         </div>
 
-        {error && (
-          <div className="mb-5 p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+        {generalError && (
+          <div className="mb-5 p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2 animate-shake">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            <span>{error}</span>
+            <span>{generalError}</span>
           </div>
         )}
 
@@ -187,14 +224,14 @@ export default function CheckoutModal({
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5" /> A Crédito (2 Cuotas)
+                    <Sparkles className="w-3.5 h-3.5" /> A Crédito (Cuotas)
                   </span>
                   <span className="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-bold">
-                    Popular
+                    Recomendado
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-400">
-                  Paga en 2 cuotas quincenales de <strong>${installmentAmount} USD</strong>.
+                  Acuerda 2 o más cuotas quincenales directamente con el vendedor.
                 </p>
               </button>
 
@@ -208,7 +245,7 @@ export default function CheckoutModal({
                 }`}
               >
                 <span className="text-xs font-bold text-white block mb-1">
-                  📲 Pago Móvil (De Contado)
+                  Pago Móvil (De Contado)
                 </span>
                 <p className="text-[11px] text-slate-400">
                   Bolívares a la tasa del día al confirmar pedido.
@@ -225,7 +262,7 @@ export default function CheckoutModal({
                 }`}
               >
                 <span className="text-xs font-bold text-white block mb-1">
-                  💵 Efectivo ($ Divisas)
+                  Efectivo ($ Divisas)
                 </span>
                 <p className="text-[11px] text-slate-400">
                   Pago contra entrega personal o en tienda.
@@ -242,7 +279,7 @@ export default function CheckoutModal({
                 }`}
               >
                 <span className="text-xs font-bold text-white block mb-1">
-                  🟡 Binance Pay / USDT
+                  Binance Pay (USDT)
                 </span>
                 <p className="text-[11px] text-slate-400">
                   Transferencia directa sin comisiones.
@@ -251,20 +288,27 @@ export default function CheckoutModal({
             </div>
           </div>
 
-          {/* Customer Details Form */}
-          <div className="space-y-3">
+          {/* Customer Details Form with Validation Errors */}
+          <div className="space-y-3.5">
             <div>
               <label className="block text-xs font-bold text-slate-300 mb-1">
                 Nombre y Apellido *
               </label>
               <input
                 type="text"
-                required
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (errors.name) setErrors({ ...errors, name: '' });
+                }}
                 placeholder="Ej. Carlos Mendoza"
-                className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                className={`w-full px-3.5 py-2.5 bg-slate-900 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition-all ${
+                  errors.name
+                    ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/40'
+                    : 'border-slate-700/80 focus:ring-2 focus:ring-rose-500'
+                }`}
               />
+              {errors.name && <p className="text-[11px] text-rose-400 mt-1 font-medium">{errors.name}</p>}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -274,54 +318,84 @@ export default function CheckoutModal({
                 </label>
                 <input
                   type="tel"
-                  required
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    if (errors.phone) setErrors({ ...errors, phone: '' });
+                  }}
                   placeholder="Ej. 0412-1234567"
-                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className={`w-full px-3.5 py-2.5 bg-slate-900 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition-all ${
+                    errors.phone
+                      ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/40'
+                      : 'border-slate-700/80 focus:ring-2 focus:ring-rose-500'
+                  }`}
                 />
+                {errors.phone && <p className="text-[11px] text-rose-400 mt-1 font-medium">{errors.phone}</p>}
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Cédula de Identidad {paymentPreference === 'credit' && '*'}
+                  Cédula de Identidad {paymentPreference === 'credit' ? '*' : '(Opcional)'}
                 </label>
                 <input
                   type="text"
-                  required={paymentPreference === 'credit'}
                   value={idNumber}
-                  onChange={(e) => setIdNumber(e.target.value)}
+                  onChange={(e) => {
+                    setIdNumber(e.target.value);
+                    if (errors.idNumber) setErrors({ ...errors, idNumber: '' });
+                  }}
                   placeholder="Ej. V-25.123.456"
-                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className={`w-full px-3.5 py-2.5 bg-slate-900 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition-all ${
+                    errors.idNumber
+                      ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/40'
+                      : 'border-slate-700/80 focus:ring-2 focus:ring-rose-500'
+                  }`}
                 />
+                {errors.idNumber && <p className="text-[11px] text-rose-400 mt-1 font-medium">{errors.idNumber}</p>}
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Ciudad / Estado
+                  Ciudad / Estado *
                 </label>
                 <input
                   type="text"
                   value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  placeholder="Ej. Caracas / Valencia"
-                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  onChange={(e) => {
+                    setCity(e.target.value);
+                    if (errors.city) setErrors({ ...errors, city: '' });
+                  }}
+                  placeholder="Ej. Caracas / Valencia / Margarita"
+                  className={`w-full px-3.5 py-2.5 bg-slate-900 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition-all ${
+                    errors.city
+                      ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/40'
+                      : 'border-slate-700/80 focus:ring-2 focus:ring-rose-500'
+                  }`}
                 />
+                {errors.city && <p className="text-[11px] text-rose-400 mt-1 font-medium">{errors.city}</p>}
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Dirección o Punto de Entrega
+                  Dirección o Punto de Entrega *
                 </label>
                 <input
                   type="text"
                   value={address}
-                  onChange={(e) => setAddress(e.target.value)}
+                  onChange={(e) => {
+                    setAddress(e.target.value);
+                    if (errors.address) setErrors({ ...errors, address: '' });
+                  }}
                   placeholder="Ej. Av. Francisco de Miranda o Tienda"
-                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className={`w-full px-3.5 py-2.5 bg-slate-900 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition-all ${
+                    errors.address
+                      ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/40'
+                      : 'border-slate-700/80 focus:ring-2 focus:ring-rose-500'
+                  }`}
                 />
+                {errors.address && <p className="text-[11px] text-rose-400 mt-1 font-medium">{errors.address}</p>}
               </div>
             </div>
 
@@ -333,7 +407,7 @@ export default function CheckoutModal({
                 rows={2}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Ej. Si tienes preferencia de horario de entrega o alguna duda"
+                placeholder="Ej. Alguna preferencia de color de trenza, horario de entrega o cuotas a proponer"
                 className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500"
               />
             </div>
@@ -354,7 +428,7 @@ export default function CheckoutModal({
               </span>
             </button>
             <p className="text-[11px] text-center text-slate-400 mt-2">
-              Al hacer clic se registrará el pedido y se abrirá WhatsApp con el mensaje listo para enviar a Alberto (+58 424-8057420).
+              Se registrará el pedido y se abrirá WhatsApp con el mensaje estructurado listo para enviar al vendedor.
             </p>
           </div>
         </form>
