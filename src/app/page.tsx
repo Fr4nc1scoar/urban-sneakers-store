@@ -407,7 +407,7 @@ export default function StorefrontPage() {
 
       {/* Floating WhatsApp Quick Action Button */}
       <a
-        href={`https://wa.me/${settings?.ownerWhatsApp || '584248057420'}?text=${encodeURIComponent('Hola Alberto! Quisiera hacerte una pregunta sobre los zapatos disponibles.')}`}
+        href={`https://api.whatsapp.com/send?phone=${settings?.ownerWhatsApp || '584248057420'}&text=${encodeURIComponent('Hola Alberto! Quisiera hacerte una pregunta sobre los zapatos disponibles.')}`}
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-40 p-4 rounded-full text-white whatsapp-glow flex items-center justify-center hover:scale-110 transition-transform shadow-2xl"
@@ -470,7 +470,7 @@ export default function StorefrontPage() {
             <ul className="space-y-2">
               <li>
                 <a
-                  href={`https://wa.me/${settings?.ownerWhatsApp || '584248057420'}`}
+                  href={`https://api.whatsapp.com/send?phone=${settings?.ownerWhatsApp || '584248057420'}`}
                   className="hover:text-emerald-400 transition-colors flex items-center gap-1.5"
                 >
                   <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />

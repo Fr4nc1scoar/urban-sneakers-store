@@ -224,7 +224,7 @@ export default function AdminInstallmentModal({
 
                     {/* Button to send WhatsApp payment collection reminder */}
                     <a
-                      href={(inst as any).reminderWhatsAppUrl || `https://wa.me/${order.customer.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${order.customer.name}! Te escribo de Alberto Shoes para recordarte tu cuota #${inst.number} por $${inst.amount} USD.`)}`}
+                      href={(inst as any).reminderWhatsAppUrl || `https://api.whatsapp.com/send?phone=${order.customer.phone.replace(/\D/g, '')}&text=${encodeURIComponent(`Hola ${order.customer.name}! Te escribo de Alberto Shoes para recordarte tu cuota #${inst.number} por $${inst.amount} USD.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3 py-1 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition-all shadow-md shadow-emerald-600/30"

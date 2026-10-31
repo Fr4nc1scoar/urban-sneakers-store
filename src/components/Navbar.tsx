@@ -61,7 +61,7 @@ export default function Navbar({
         <div className="flex items-center gap-3">
           {/* Direct WhatsApp Contact Button */}
           <a
-            href={`https://wa.me/${ownerPhone}?text=${encodeURIComponent('Hola Alberto! Vengo de tu página web y tengo una consulta sobre los zapatos.')}`}
+            href={`https://api.whatsapp.com/send?phone=${ownerPhone}&text=${encodeURIComponent('Hola Alberto! Vengo de tu página web y tengo una consulta sobre los zapatos.')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-all"

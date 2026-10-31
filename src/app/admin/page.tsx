@@ -31,6 +31,22 @@ import {
 } from 'lucide-react';
 import AdminInstallmentModal from '@/components/AdminInstallmentModal';
 
+function formatDateTime(dateStr: string): string {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const day = d.getDate();
+    const month = months[d.getMonth()];
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const mins = String(d.getMinutes()).padStart(2, '0');
+    return `${day} ${month} ${year}, ${hours}:${mins}`;
+  } catch {
+    return dateStr;
+  }
+}
+
 export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -514,10 +530,7 @@ export default function AdminPage() {
                           </span>
                           <span className="text-xs text-slate-500">•</span>
                           <span className="text-xs text-slate-400">
-                            {new Date(order.createdAt).toLocaleDateString('es-VE', {
-                              dateStyle: 'medium',
-                              timeStyle: 'short',
-                            })}
+                            {formatDateTime(order.createdAt)}
                           </span>
 
                           {/* Status Badge Dropdown */}
@@ -644,7 +657,7 @@ export default function AdminPage() {
                         <div className="flex items-center gap-2">
                           {/* Direct WhatsApp button to chat with customer */}
                           <a
-                            href={`https://wa.me/${order.customer.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${order.customer.name}! Te escribo de Alberto Shoes sobre tu pedido ${order.orderNumber}.`)}`}
+                            href={`https://api.whatsapp.com/send?phone=${order.customer.phone.replace(/\D/g, '')}&text=${encodeURIComponent(`Hola ${order.customer.name}! Te escribo de Alberto Shoes sobre tu pedido ${order.orderNumber}.`)}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30 transition-all"

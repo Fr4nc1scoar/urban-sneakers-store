@@ -1,0 +1,32 @@
+{
+  "storeName": "Alberto Shoes Collection",
+  "ownerWhatsApp": "584248057420",
+  "ownerWhatsAppDisplay": "+58 424-8057420",
+  "defaultShoePrice": 50,
+  "catalogSourceUrl": "https://loading-stylee.ola.click/products/?type=read",
+  "whatsappCatalogUrl": "https://wa.me/c/584124717225",
+  "paymentDetails": {
+    "pagoMovil": {
+      "banco": "Banesco (0134)",
+      "cedula": "V-24.805.742",
+      "telefono": "0424-8057420",
+      "titular": "Alberto Calzados"
+    },
+    "binancePay": {
+      "payId": "849201948",
+      "email": "pagos.albertozapatos@gmail.com"
+    },
+    "zelle": {
+      "email": "albertozapatos.ve@gmail.com",
+      "titular": "Alberto Store"
+    },
+    "efectivo": {
+      "instrucciones": "Pago en dólares en efectivo exactos contra entrega personal o en tienda."
+    }
+  },
+  "creditRules": {
+    "defaultInstallments": 2,
+    "defaultIntervalDays": 15,
+    "allowCustomSplits": true
+  }
+}
