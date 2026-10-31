@@ -183,10 +183,10 @@ export default function ProductDetailModal({
               type="button"
               onClick={handleAdd}
               disabled={!selectedSize}
-              className={`w-full py-3.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+              className={`w-full py-3.5 px-4 rounded-xl font-black text-sm flex items-center justify-center gap-2 transition-all ${
                 addedAnimation
-                  ? 'bg-emerald-500 text-black'
-                  : 'glass-button-glow font-black text-[#06060c]'
+                  ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/50'
+                  : 'neon-button-glow text-white'
               } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {addedAnimation ? (
@@ -204,17 +204,17 @@ export default function ProductDetailModal({
               type="button"
               onClick={handleBuyNow}
               disabled={!selectedSize}
-              className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-white/[0.06] hover:bg-white/[0.1] text-white border border-white/[0.1] flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-white/[0.06] hover:bg-white/[0.12] text-white border border-amber-500/40 hover:border-amber-400 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(245,158,11,0.15)]"
             >
-              <CreditCard className="w-4 h-4 text-[#D1C4FF]" />
+              <CreditCard className="w-4 h-4 text-amber-400" />
               <span>Comprar / Solicitar Crédito Ahora</span>
             </button>
           </div>
 
           {/* Reassurance pills */}
-          <div className="mt-4 pt-3 flex items-center justify-around text-[10px] font-mono text-slate-400 border-t border-white/[0.08]">
+          <div className="mt-4 pt-3 flex items-center justify-around text-[10px] font-mono text-slate-300 border-t border-white/[0.08]">
             <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#D1C4FF]" /> 100% Garantizados
+              <ShieldCheck className="w-3.5 h-3.5 text-rose-400" /> 100% Garantizados
             </span>
             <span className="flex items-center gap-1">
               <Truck className="w-3.5 h-3.5 text-emerald-400" /> Envíos Directos

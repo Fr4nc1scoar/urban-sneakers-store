@@ -182,7 +182,7 @@ export default function CartDrawer({
               {/* Checkout Button */}
               <button
                 onClick={onProceedToCheckout}
-                className="w-full py-4 px-6 rounded-2xl font-black text-sm text-[#06060c] glass-button-glow flex items-center justify-center gap-2 group transition-all"
+                className="w-full py-4 px-6 rounded-2xl font-black text-sm text-white neon-button-glow flex items-center justify-center gap-2 group transition-all"
               >
                 <span>Continuar y Acordar Pedido</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

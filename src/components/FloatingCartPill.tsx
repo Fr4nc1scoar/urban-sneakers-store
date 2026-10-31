@@ -10,7 +10,7 @@ interface FloatingCartPillProps {
 }
 
 /**
- * Floating Dynamic Island Cart Pill (Fintech & Luxury E-commerce style)
+ * Floating Dynamic Island Cart Pill (Fintech & Streetwear Luxury style)
  * Appears dynamically when items are in cart with glowing specular rim,
  * live subtotal counter, and instant 1-click checkout trigger.
  */
@@ -29,12 +29,12 @@ export default function FloatingCartPill({ items, onOpenCart }: FloatingCartPill
         onClick={onOpenCart}
         data-interactive="true"
         data-cursor-text="CARRITO"
-        className="group cursor-pointer flex items-center gap-3.5 p-2 pr-4 lg:p-2.5 lg:pr-5 rounded-full bg-[#0d0f1b]/95 border border-[#D1C4FF]/40 backdrop-blur-2xl shadow-[0_12px_40px_rgba(0,0,0,0.8),0_0_25px_rgba(209,196,255,0.25)] hover:border-[#D1C4FF] hover:shadow-[0_12px_50px_rgba(209,196,255,0.35)] transition-all duration-300"
+        className="group cursor-pointer flex items-center gap-3.5 p-2 pr-4 lg:p-2.5 lg:pr-5 rounded-full bg-[#0d0f1b]/95 border border-rose-500/50 backdrop-blur-2xl shadow-[0_12px_40px_rgba(0,0,0,0.8),0_0_25px_rgba(244,63,94,0.35)] hover:border-rose-400 hover:shadow-[0_12px_50px_rgba(244,63,94,0.6)] transition-all duration-300"
       >
         {/* Animated Icon Circle */}
-        <div className="relative w-12 h-12 rounded-full bg-gradient-to-tr from-[#7C3AED] to-[#D1C4FF] text-[#06060c] flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-105 transition-transform">
-          <ShoppingBag className="w-5 h-5 text-black stroke-[2.5]" />
-          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-[11px] font-black flex items-center justify-center border-2 border-[#0d0f1b] shadow-md animate-bounce">
+        <div className="relative w-12 h-12 rounded-full bg-gradient-to-tr from-rose-600 via-pink-600 to-amber-500 text-white flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-105 transition-transform">
+          <ShoppingBag className="w-5 h-5 text-white stroke-[2.5]" />
+          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-400 text-black text-[11px] font-black flex items-center justify-center border-2 border-[#0d0f1b] shadow-md animate-bounce">
             {totalQuantity}
           </span>
         </div>
@@ -45,18 +45,18 @@ export default function FloatingCartPill({ items, onOpenCart }: FloatingCartPill
             <span className="text-white font-black text-sm lg:text-base tracking-tight">
               ${totalAmount} USD
             </span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#D1C4FF]/15 text-[#D1C4FF] border border-[#D1C4FF]/30">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
               {totalQuantity} {totalQuantity === 1 ? 'par' : 'pares'}
             </span>
           </div>
-          <span className="text-[11px] text-slate-400 font-medium flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-[#D1C4FF]" />
+          <span className="text-[11px] text-amber-300 font-medium flex items-center gap-1">
+            <Sparkles className="w-3 h-3 text-amber-400" />
             Crédito disponible en cuotas
           </span>
         </div>
 
         {/* Micro-CTA Button */}
-        <div className="ml-2 pl-3 border-l border-white/10 flex items-center gap-1 text-xs font-bold text-[#D1C4FF] group-hover:text-white transition-colors">
+        <div className="ml-2 pl-3 border-l border-white/10 flex items-center gap-1 text-xs font-bold text-rose-400 group-hover:text-white transition-colors">
           <span>Ver Carrito</span>
           <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
         </div>

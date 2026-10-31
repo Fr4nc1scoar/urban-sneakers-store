@@ -218,13 +218,13 @@ export default function StorefrontPage() {
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 text-[#D1C4FF] font-mono font-bold text-xs uppercase tracking-widest mb-1">
-                <Sparkles className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-2 text-rose-500 font-mono font-bold text-xs uppercase tracking-widest mb-1">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                 <span>Colección Exclusiva 2026</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
                 Modelos Disponibles{' '}
-                <span className="text-[#D1C4FF] font-mono font-bold text-xl sm:text-2xl">
+                <span className="bg-gradient-to-r from-rose-500 to-amber-400 bg-clip-text text-transparent font-mono font-bold text-xl sm:text-2xl">
                   ({filteredProducts.length})
                 </span>
               </h2>
@@ -236,7 +236,7 @@ export default function StorefrontPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-[#0b0c16] border border-white/[0.08] rounded-2xl px-3.5 py-2 text-xs font-mono text-white focus:outline-none focus:ring-1 focus:ring-[#D1C4FF] shadow-lg backdrop-blur-xl"
+                className="bg-[#0b0c16] border border-white/[0.12] rounded-2xl px-3.5 py-2 text-xs font-mono text-white focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-lg backdrop-blur-xl"
               >
                 <option value="featured">Destacados / Populares</option>
                 <option value="name-asc">Nombre (A - Z)</option>
@@ -245,14 +245,14 @@ export default function StorefrontPage() {
             </div>
           </div>
 
-          {/* Brand Filter Chips Carousel */}
+          {/* Brand Filter Chips Carousel with High-Energy Neons */}
           <div className="flex items-center gap-2.5 overflow-x-auto pb-2 no-scrollbar">
             <button
               onClick={() => setSelectedBrand('all')}
               className={`px-4 py-2.5 rounded-2xl text-xs font-mono font-bold whitespace-nowrap transition-all ${
                 selectedBrand === 'all'
-                  ? 'bg-[#D1C4FF] text-[#06060c] shadow-[0_0_20px_rgba(209,196,255,0.4)]'
-                  : 'bg-white/[0.03] text-slate-300 hover:text-white border border-white/[0.08] hover:border-white/20 backdrop-blur-md'
+                  ? 'bg-gradient-to-r from-rose-600 via-pink-600 to-amber-500 text-white shadow-[0_0_20px_rgba(244,63,94,0.6)] border border-rose-400'
+                  : 'bg-white/[0.04] text-slate-300 hover:text-white border border-white/[0.1] hover:border-rose-400/60 backdrop-blur-md'
               }`}
             >
               Todas las Marcas ({products.length})
@@ -263,8 +263,8 @@ export default function StorefrontPage() {
                 onClick={() => setSelectedBrand(brand)}
                 className={`px-4 py-2.5 rounded-2xl text-xs font-mono font-bold whitespace-nowrap transition-all ${
                   selectedBrand.toLowerCase() === brand.toLowerCase()
-                    ? 'bg-[#D1C4FF] text-[#06060c] shadow-[0_0_20px_rgba(209,196,255,0.4)]'
-                    : 'bg-white/[0.03] text-slate-300 hover:text-white border border-white/[0.08] hover:border-white/20 backdrop-blur-md'
+                    ? 'bg-gradient-to-r from-rose-600 via-pink-600 to-amber-500 text-white shadow-[0_0_20px_rgba(244,63,94,0.6)] border border-rose-400'
+                    : 'bg-white/[0.04] text-slate-300 hover:text-white border border-white/[0.1] hover:border-rose-400/60 backdrop-blur-md'
                 }`}
               >
                 {brand}
@@ -272,10 +272,10 @@ export default function StorefrontPage() {
             ))}
           </div>
 
-          {/* Size Filter Pills Bar */}
-          <div className="p-4 rounded-3xl bg-[#0c0d18]/80 border border-white/[0.08] backdrop-blur-2xl flex flex-wrap items-center gap-2 shadow-xl">
+          {/* Size Filter Pills Bar with Vivid Highlights */}
+          <div className="p-4 rounded-3xl bg-[#0c0d18]/90 border border-white/[0.1] backdrop-blur-2xl flex flex-wrap items-center gap-2 shadow-xl">
             <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-300 mr-2">
-              <Filter className="w-3.5 h-3.5 text-[#D1C4FF]" />
+              <Filter className="w-3.5 h-3.5 text-rose-500" />
               <span>Filtrar por Talla:</span>
             </div>
 
@@ -283,8 +283,8 @@ export default function StorefrontPage() {
               onClick={() => setSelectedSize(null)}
               className={`px-3 py-1 rounded-xl text-xs font-mono font-bold transition-all ${
                 selectedSize === null
-                  ? 'bg-[#D1C4FF]/20 text-[#D1C4FF] border border-[#D1C4FF]/50 shadow-[0_0_12px_rgba(209,196,255,0.3)]'
-                  : 'bg-white/[0.03] text-slate-400 hover:text-slate-200 border border-transparent'
+                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/50 shadow-[0_0_12px_rgba(244,63,94,0.4)]'
+                  : 'bg-white/[0.04] text-slate-400 hover:text-slate-200 border border-transparent'
               }`}
             >
               Cualquiera
@@ -296,8 +296,8 @@ export default function StorefrontPage() {
                 onClick={() => setSelectedSize(selectedSize === size ? null : size)}
                 className={`px-3 py-1 rounded-xl text-xs font-mono font-bold transition-all ${
                   selectedSize === size
-                    ? 'bg-[#D1C4FF] text-[#06060c] shadow-[0_0_15px_rgba(209,196,255,0.5)] ring-1 ring-[#D1C4FF]'
-                    : 'bg-white/[0.03] text-slate-300 hover:bg-white/[0.07] border border-white/[0.08]'
+                    ? 'bg-gradient-to-r from-rose-600 to-pink-600 text-white shadow-[0_0_15px_rgba(244,63,94,0.6)] ring-1 ring-rose-400'
+                    : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.08]'
                 }`}
               >
                 EU {size}

@@ -26,51 +26,61 @@ export default function ProductCard3D({
   );
   const [justAdded, setJustAdded] = useState(false);
 
-  // Brand-specific accent glows inspired by luxury showroom displays
-  const brandAccents: Record<string, { glow: string; text: string; bg: string; border: string }> = {
+  // High-Energy Brand Color Accents
+  const brandAccents: Record<
+    string,
+    { glow: string; text: string; badge: string; borderHover: string; shadow: string }
+  > = {
     Nike: {
-      glow: 'rgba(209, 196, 255, 0.25)',
-      text: '#D1C4FF',
-      bg: 'bg-[#D1C4FF]/10',
-      border: 'border-[#D1C4FF]/30',
+      glow: 'rgba(244, 63, 94, 0.4)',
+      text: 'text-rose-400',
+      badge: 'bg-gradient-to-r from-rose-600 to-pink-600 text-white shadow-[0_0_15px_rgba(244,63,94,0.5)]',
+      borderHover: 'hover:border-rose-500/70',
+      shadow: 'hover:shadow-[0_10px_35px_-5px_rgba(244,63,94,0.35)]',
     },
     Jordan: {
-      glow: 'rgba(244, 63, 94, 0.25)',
-      text: '#fb7185',
-      bg: 'bg-rose-500/10',
-      border: 'border-rose-500/30',
+      glow: 'rgba(239, 68, 68, 0.4)',
+      text: 'text-red-400',
+      badge: 'bg-gradient-to-r from-red-600 to-rose-700 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]',
+      borderHover: 'hover:border-red-500/70',
+      shadow: 'hover:shadow-[0_10px_35px_-5px_rgba(239,68,68,0.35)]',
     },
     Adidas: {
-      glow: 'rgba(56, 189, 248, 0.25)',
-      text: '#38bdf8',
-      bg: 'bg-sky-500/10',
-      border: 'border-sky-500/30',
+      glow: 'rgba(59, 130, 246, 0.4)',
+      text: 'text-blue-400',
+      badge: 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.5)]',
+      borderHover: 'hover:border-blue-500/70',
+      shadow: 'hover:shadow-[0_10px_35px_-5px_rgba(59,130,246,0.35)]',
     },
     'New Balance': {
-      glow: 'rgba(52, 211, 153, 0.25)',
-      text: '#34d399',
-      bg: 'bg-emerald-500/10',
-      border: 'border-emerald-500/30',
+      glow: 'rgba(16, 185, 129, 0.4)',
+      text: 'text-emerald-400',
+      badge: 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-[0_0_15px_rgba(16,185,129,0.5)]',
+      borderHover: 'hover:border-emerald-500/70',
+      shadow: 'hover:shadow-[0_10px_35px_-5px_rgba(16,185,129,0.35)]',
     },
     'Alexander McQueen': {
-      glow: 'rgba(251, 191, 36, 0.25)',
-      text: '#fbbf24',
-      bg: 'bg-amber-500/10',
-      border: 'border-amber-500/30',
+      glow: 'rgba(245, 158, 11, 0.4)',
+      text: 'text-amber-400',
+      badge: 'bg-gradient-to-r from-amber-500 to-yellow-600 text-black font-black shadow-[0_0_15px_rgba(245,158,11,0.5)]',
+      borderHover: 'hover:border-amber-500/70',
+      shadow: 'hover:shadow-[0_10px_35px_-5px_rgba(245,158,11,0.35)]',
     },
     Salomon: {
-      glow: 'rgba(251, 146, 60, 0.25)',
-      text: '#fb923c',
-      bg: 'bg-orange-500/10',
-      border: 'border-orange-500/30',
+      glow: 'rgba(249, 115, 22, 0.4)',
+      text: 'text-orange-400',
+      badge: 'bg-gradient-to-r from-orange-500 to-amber-600 text-white shadow-[0_0_15px_rgba(249,115,22,0.5)]',
+      borderHover: 'hover:border-orange-500/70',
+      shadow: 'hover:shadow-[0_10px_35px_-5px_rgba(249,115,22,0.35)]',
     },
   };
 
   const accent = brandAccents[product.brand] || {
-    glow: 'rgba(209, 196, 255, 0.25)',
-    text: '#D1C4FF',
-    bg: 'bg-[#D1C4FF]/10',
-    border: 'border-[#D1C4FF]/30',
+    glow: 'rgba(244, 63, 94, 0.35)',
+    text: 'text-rose-400',
+    badge: 'bg-gradient-to-r from-rose-600 to-purple-600 text-white shadow-[0_0_15px_rgba(244,63,94,0.5)]',
+    borderHover: 'hover:border-rose-500/70',
+    shadow: 'hover:shadow-[0_10px_35px_-5px_rgba(244,63,94,0.3)]',
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -105,14 +115,14 @@ export default function ProductCard3D({
       onMouseLeave={handleMouseLeave}
       data-interactive="true"
       data-cursor-text="ZAPATO"
-      className="product-card-interactive group relative rounded-3xl p-[1px] overflow-hidden transition-all duration-300"
+      className={`product-card-interactive group relative rounded-3xl p-[1px] overflow-hidden transition-all duration-300 ${accent.borderHover} ${accent.shadow}`}
     >
-      {/* Dynamic Cursor Spotlight Border (Unique Capital / Bento style) */}
+      {/* Dynamic Cursor Spotlight Border with Multi-Color Neon */}
       <div
         className="pointer-events-none absolute inset-0 rounded-3xl transition-opacity duration-300 z-10"
         style={{
           opacity: mousePos.isHover ? 1 : 0,
-          background: `radial-gradient(400px circle at ${mousePos.x}px ${mousePos.y}px, rgba(209, 196, 255, 0.6) 0%, rgba(209, 196, 255, 0.15) 35%, transparent 70%)`,
+          background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, rgba(244, 63, 94, 0.7) 0%, rgba(245, 158, 11, 0.35) 40%, transparent 75%)`,
         }}
       />
 
@@ -120,24 +130,15 @@ export default function ProductCard3D({
       <div className="absolute inset-0 rounded-3xl border border-white/[0.08] pointer-events-none z-10" />
 
       {/* Main Card Surface */}
-      <div className="relative rounded-[23px] bg-[#0c0d18]/90 backdrop-blur-2xl overflow-hidden h-full flex flex-col justify-between z-20 transition-all duration-300 group-hover:bg-[#0e0f1d]">
-        {/* Subtle Specular Surface Light */}
-        <div
-          className="pointer-events-none absolute inset-0 transition-opacity duration-500"
-          style={{
-            opacity: mousePos.isHover ? 0.08 : 0,
-            background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, #D1C4FF 0%, transparent 80%)`,
-          }}
-        />
-
+      <div className="relative rounded-[23px] bg-[#0c0d18]/92 backdrop-blur-2xl overflow-hidden h-full flex flex-col justify-between z-20 transition-all duration-300 group-hover:bg-[#0e0f1e]">
         {/* Sneaker Image Box */}
         <div
           onClick={() => onSelectProduct(product, selectedSize || undefined)}
-          className="relative aspect-square w-full bg-[#080811] overflow-hidden cursor-pointer flex items-center justify-center"
+          className="relative aspect-square w-full bg-[#080812] overflow-hidden cursor-pointer flex items-center justify-center"
         >
-          {/* Subtle Ambient Radial Glow behind the shoe */}
+          {/* Vibrant Ambient Radial Glow matching the shoe's brand */}
           <div
-            className="absolute w-44 h-44 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"
+            className="absolute w-48 h-48 rounded-full blur-3xl opacity-35 group-hover:opacity-70 group-hover:scale-125 transition-all duration-500"
             style={{ backgroundColor: accent.glow }}
           />
 
@@ -145,14 +146,16 @@ export default function ProductCard3D({
             src={product.image}
             alt={product.name}
             loading="lazy"
-            className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-700 ease-out"
+            className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out"
           />
+
+          {/* Top Gradient Vignette */}
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/80 to-transparent pointer-events-none" />
 
           {/* Luxury Brand Tag */}
           <div className="absolute top-3.5 left-3.5 z-10">
             <span
-              className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase border backdrop-blur-xl shadow-lg ${accent.bg} ${accent.border}`}
-              style={{ color: accent.text }}
+              className={`px-3 py-1 rounded-xl text-[10px] font-mono font-black tracking-wider uppercase border border-white/20 backdrop-blur-xl ${accent.badge}`}
             >
               {product.brand}
             </span>
@@ -160,16 +163,16 @@ export default function ProductCard3D({
 
           {/* Stock Tag with Pulsing Neon Dot */}
           <div className="absolute top-3.5 right-3.5 z-10">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-semibold bg-black/60 text-emerald-400 border border-emerald-500/30 backdrop-blur-xl shadow-md">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-black/75 text-emerald-300 border border-emerald-500/50 backdrop-blur-xl shadow-md">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
               STOCK EN VIVO
             </span>
           </div>
 
           {/* Hover View Button Overlay */}
-          <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
-            <span className="px-4 py-2 rounded-full bg-black/80 text-white text-xs font-bold font-mono tracking-wide flex items-center gap-2 backdrop-blur-xl border border-white/20 shadow-2xl scale-95 group-hover:scale-100 transition-transform">
-              <Eye className="w-3.5 h-3.5 text-[#D1C4FF]" /> VER DETALLES
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+            <span className="px-4 py-2 rounded-full bg-black/85 text-white text-xs font-bold font-mono tracking-wide flex items-center gap-2 backdrop-blur-xl border border-white/25 shadow-2xl scale-95 group-hover:scale-100 transition-transform">
+              <Eye className="w-3.5 h-3.5 text-rose-400" /> VER DETALLES
             </span>
           </div>
         </div>
@@ -179,7 +182,7 @@ export default function ProductCard3D({
           <div>
             <h3
               onClick={() => onSelectProduct(product, selectedSize || undefined)}
-              className="font-bold text-[15px] text-white group-hover:text-[#D1C4FF] transition-colors line-clamp-1 cursor-pointer tracking-tight"
+              className="font-bold text-[15px] text-white group-hover:text-rose-400 transition-colors line-clamp-1 cursor-pointer tracking-tight"
               title={product.name}
             >
               {product.name}
@@ -189,7 +192,7 @@ export default function ProductCard3D({
             <div className="mt-3">
               <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2 font-mono">
                 <span className="text-slate-400">Tallas disponibles:</span>
-                <span className="text-[#D1C4FF] font-semibold">{product.sizes.length} tallas</span>
+                <span className="text-amber-400 font-bold">{product.sizes.length} tallas</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {product.sizes.slice(0, 5).map((size) => {
@@ -204,8 +207,8 @@ export default function ProductCard3D({
                       }}
                       className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all ${
                         isSelected
-                          ? 'bg-[#D1C4FF] text-[#06060c] border border-[#D1C4FF] shadow-[0_0_12px_rgba(209,196,255,0.4)] scale-105'
-                          : 'bg-white/[0.04] text-slate-300 border border-white/[0.08] hover:border-white/20 hover:text-white'
+                          ? 'bg-gradient-to-r from-rose-600 to-pink-600 text-white border border-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.6)] scale-105'
+                          : 'bg-white/[0.05] text-slate-200 border border-white/[0.1] hover:border-rose-400/60 hover:text-white'
                       }`}
                     >
                       {size}
@@ -219,7 +222,7 @@ export default function ProductCard3D({
                       e.stopPropagation();
                       onSelectProduct(product);
                     }}
-                    className="px-2 py-1 rounded-lg text-[10px] font-mono text-slate-400 hover:text-white bg-white/[0.03] border border-white/[0.06] hover:border-white/20 transition-all"
+                    className="px-2 py-1 rounded-lg text-[10px] font-mono text-slate-300 hover:text-white bg-white/[0.04] border border-white/[0.08] hover:border-amber-400 transition-all"
                   >
                     +{product.sizes.length - 5} más
                   </button>
@@ -229,18 +232,18 @@ export default function ProductCard3D({
           </div>
 
           {/* Pricing & CTA */}
-          <div className="pt-3 border-t border-white/[0.07] flex items-center justify-between gap-3">
+          <div className="pt-3 border-t border-white/[0.08] flex items-center justify-between gap-3">
             <div>
               <div className="flex items-baseline gap-1">
                 <span className="text-xl font-black text-white tracking-tight">
                   ${product.price}
                 </span>
-                <span className="text-[11px] font-mono font-semibold text-slate-400 uppercase">
+                <span className="text-[11px] font-mono font-bold text-slate-400 uppercase">
                   USD
                 </span>
               </div>
-              <div className="text-[10px] font-mono text-[#D1C4FF] flex items-center gap-1 font-medium">
-                <Sparkles className="w-2.5 h-2.5" />
+              <div className="text-[10px] font-mono text-amber-400 flex items-center gap-1 font-bold">
+                <Sparkles className="w-3 h-3 text-amber-400" />
                 <span>Cuotas quincenales</span>
               </div>
             </div>
@@ -249,10 +252,10 @@ export default function ProductCard3D({
             <button
               type="button"
               onClick={handleAddToCartClick}
-              className={`px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all duration-200 shadow-md ${
+              className={`px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all duration-200 shadow-md cursor-pointer ${
                 justAdded
                   ? 'bg-emerald-500 text-black border border-emerald-400'
-                  : 'bg-white/[0.08] hover:bg-[#D1C4FF] text-white hover:text-[#06060c] border border-white/10 hover:border-[#D1C4FF] hover:shadow-[0_0_20px_rgba(209,196,255,0.4)]'
+                  : 'bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white shadow-[0_0_15px_rgba(244,63,94,0.45)] hover:shadow-[0_0_25px_rgba(244,63,94,0.7)]'
               }`}
               title="Agregar al Carrito"
             >

@@ -3,9 +3,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 
 /**
- * High-End Custom Mouse Follower inspired by Unique Capital & Iqxion (.mf-cursor)
- * Features smooth Lerp trailing physics, scale expansion on interactive elements,
- * and a luxury lilac/lavender glow aesthetic. Automatically disables on touch screens.
+ * High-Performance Colorful Mouse Follower (Streetwear / Luxury Edition)
+ * Features smooth Lerp trailing physics, vibrant neon rose & amber glows,
+ * and automatic pause when mouse is idle to eliminate 100% CPU overhead.
  */
 export default function MouseFollower() {
   const [isDesktop, setIsDesktop] = useState(false);
@@ -17,6 +17,7 @@ export default function MouseFollower() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const targetPos = useRef({ x: -100, y: -100 });
   const currentPos = useRef({ x: -100, y: -100 });
+  const isMoving = useRef(false);
   const animationFrameId = useRef<number | null>(null);
 
   useEffect(() => {
@@ -29,9 +30,33 @@ export default function MouseFollower() {
     checkPointer();
     window.addEventListener('resize', checkPointer);
 
+    const updatePosition = () => {
+      const ease = 0.2;
+      const dx = targetPos.current.x - currentPos.current.x;
+      const dy = targetPos.current.y - currentPos.current.y;
+
+      currentPos.current.x += dx * ease;
+      currentPos.current.y += dy * ease;
+
+      if (cursorRef.current) {
+        cursorRef.current.style.transform = `translate3d(${currentPos.current.x}px, ${currentPos.current.y}px, 0)`;
+      }
+
+      if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+        animationFrameId.current = requestAnimationFrame(updatePosition);
+      } else {
+        isMoving.current = false;
+      }
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
       targetPos.current = { x: e.clientX, y: e.clientY };
       if (!isVisible) setIsVisible(true);
+
+      if (!isMoving.current) {
+        isMoving.current = true;
+        animationFrameId.current = requestAnimationFrame(updatePosition);
+      }
 
       // Check if hovering an interactive element
       const target = e.target as HTMLElement | null;
@@ -57,21 +82,6 @@ export default function MouseFollower() {
     document.addEventListener('mouseleave', handleMouseLeave);
     document.addEventListener('mouseenter', handleMouseEnter);
 
-    // Smooth Lerp physics render loop
-    const render = () => {
-      const ease = 0.18; // smooth trailing ease
-      currentPos.current.x += (targetPos.current.x - currentPos.current.x) * ease;
-      currentPos.current.y += (targetPos.current.y - currentPos.current.y) * ease;
-
-      if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate3d(${currentPos.current.x}px, ${currentPos.current.y}px, 0)`;
-      }
-
-      animationFrameId.current = requestAnimationFrame(render);
-    };
-
-    animationFrameId.current = requestAnimationFrame(render);
-
     return () => {
       window.removeEventListener('resize', checkPointer);
       window.removeEventListener('mousemove', handleMouseMove);
@@ -94,24 +104,26 @@ export default function MouseFollower() {
         transition: 'opacity 0.25s ease-out',
       }}
     >
-      {/* Outer Follower Ring */}
+      {/* Outer Follower Ring with Vibrant Neon Colors */}
       <div
         className={`relative -top-1/2 -left-1/2 flex items-center justify-center rounded-full transition-all duration-300 ease-out ${
           isHoveringInteractive
-            ? 'w-12 h-12 bg-[#D1C4FF]/15 border border-[#D1C4FF] shadow-[0_0_20px_rgba(209,196,255,0.4)] backdrop-blur-[2px]'
-            : 'w-6 h-6 bg-[#D1C4FF]/25 border border-[#D1C4FF]/70 shadow-[0_0_10px_rgba(209,196,255,0.3)]'
-        } ${isClicking ? 'scale-75 bg-[#D1C4FF]/40' : 'scale-100'}`}
+            ? 'w-12 h-12 bg-gradient-to-tr from-rose-500/25 via-purple-500/20 to-amber-500/25 border-2 border-rose-400 shadow-[0_0_25px_rgba(244,63,94,0.7)] backdrop-blur-[2px]'
+            : 'w-6 h-6 bg-rose-500/30 border border-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.5)]'
+        } ${isClicking ? 'scale-75 bg-rose-500/60' : 'scale-100'}`}
       >
         {/* Center Precision Dot */}
         <div
-          className={`rounded-full bg-white transition-all duration-200 ${
-            isHoveringInteractive ? 'w-1 h-1 opacity-60' : 'w-1.5 h-1.5 opacity-100 shadow-[0_0_6px_#fff]'
+          className={`rounded-full transition-all duration-200 ${
+            isHoveringInteractive
+              ? 'w-1 h-1 bg-amber-400 opacity-80 shadow-[0_0_6px_#fbbf24]'
+              : 'w-1.5 h-1.5 bg-white opacity-100 shadow-[0_0_6px_#fff]'
           }`}
         />
 
         {/* Optional text badge inside cursor */}
         {hoverText && (
-          <span className="absolute text-[8px] font-mono font-black uppercase tracking-wider text-white whitespace-nowrap drop-shadow">
+          <span className="absolute text-[8px] font-mono font-black uppercase tracking-wider text-white whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
             {hoverText}
           </span>
         )}

@@ -10,7 +10,7 @@ interface RotatingWhatsAppStampProps {
 
 /**
  * Signature Unique Capital Rotating Contact Stamp Widget
- * Features a circular rotating text path stamp ("★ ASESORÍA PERSONALIZADA ★ URBAN SNEAKERS ★")
+ * Features a circular rotating text path stamp with vivid colors
  * and an elevated pulsing WhatsApp action button in the center.
  */
 export default function RotatingWhatsAppStamp({
@@ -33,13 +33,13 @@ export default function RotatingWhatsAppStamp({
         rel="noopener noreferrer"
         data-interactive="true"
         data-cursor-text="CHAT"
-        className="relative block w-28 h-28 lg:w-32 lg:h-32 flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
+        className="relative block w-28 h-28 lg:w-32 lg:h-32 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 cursor-pointer"
         title={`Hablar con el vendedor (${whatsappDisplay})`}
       >
         {/* Ambient Halo Glow */}
-        <div className="absolute inset-2 rounded-full bg-[#25D366]/20 blur-xl opacity-75 group-hover:opacity-100 group-hover:bg-[#D1C4FF]/30 transition-all duration-500" />
+        <div className="absolute inset-2 rounded-full bg-[#25D366]/25 blur-xl opacity-80 group-hover:opacity-100 group-hover:bg-[#25D366]/40 transition-all duration-500" />
 
-        {/* Rotating Circular Text Ring (Unique Capital Signature Effect) */}
+        {/* Rotating Circular Text Ring */}
         <div className="absolute inset-0 w-full h-full animate-[spin_18s_linear_infinite] group-hover:animate-[spin_10s_linear_infinite] pointer-events-none">
           <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
             <defs>
@@ -49,8 +49,8 @@ export default function RotatingWhatsAppStamp({
               />
             </defs>
             <text
-              fill="#D1C4FF"
-              className="text-[8.5px] font-mono font-bold tracking-[0.24em] uppercase opacity-85 group-hover:opacity-100 group-hover:fill-white transition-colors"
+              fill="#34D399"
+              className="text-[8.5px] font-mono font-bold tracking-[0.24em] uppercase opacity-90 group-hover:opacity-100 group-hover:fill-emerald-300 transition-colors"
             >
               <textPath xlinkHref="#circlePath" href="#circlePath">
                 • ASESORIA DIRECTA • URBAN SNEAKERS • ATENCION EN VIVO 
@@ -60,9 +60,9 @@ export default function RotatingWhatsAppStamp({
         </div>
 
         {/* Center Glowing Action Circle */}
-        <div className="relative w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-gradient-to-tr from-[#128C7E] to-[#25D366] text-white flex items-center justify-center shadow-[0_4px_25px_rgba(37,211,102,0.5)] group-hover:shadow-[0_6px_35px_rgba(209,196,255,0.7)] group-hover:from-[#9333EA] group-hover:to-[#D1C4FF] transition-all duration-300">
+        <div className="relative w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-gradient-to-tr from-[#128C7E] to-[#25D366] text-white flex items-center justify-center shadow-[0_4px_25px_rgba(37,211,102,0.65)] group-hover:shadow-[0_6px_35px_rgba(37,211,102,0.9)] group-hover:scale-105 transition-all duration-300">
           <MessageCircle className="w-7 h-7 lg:w-8 lg:h-8 drop-shadow" />
-          
+
           {/* Online status indicator dot */}
           <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-[#06060c] animate-ping" />
           <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-[#06060c]" />
