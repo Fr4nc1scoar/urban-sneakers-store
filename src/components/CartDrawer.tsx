@@ -43,7 +43,7 @@ export default function CartDrawer({
           {/* Header */}
           <div className="p-6 border-b border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-rose-500/15 text-rose-500">
+              <div className="p-2 rounded-xl bg-[#D1C4FF]/15 text-[#D1C4FF]">
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <div>
@@ -182,7 +182,7 @@ export default function CartDrawer({
               {/* Checkout Button */}
               <button
                 onClick={onProceedToCheckout}
-                className="w-full py-4 px-6 rounded-2xl font-bold text-sm text-white glass-button-glow flex items-center justify-center gap-2 group transition-all"
+                className="w-full py-4 px-6 rounded-2xl font-black text-sm text-[#06060c] glass-button-glow flex items-center justify-center gap-2 group transition-all"
               >
                 <span>Continuar y Acordar Pedido</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

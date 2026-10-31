@@ -23,11 +23,11 @@ export default function OrderSuccessModal({
 
   const handleCopy = () => {
     const text =
-      `📦 Pedido: ${order.orderNumber}\n` +
-      `Cliente: ${order.customer.name}\n` +
-      `Total: $${order.totalAmount} USD\n` +
-      `Modalidad: ${order.isCredit ? 'A Crédito (2 Cuotas)' : 'De Contado'}\n` +
-      `Items: ${order.items.map(i => `${i.name} (Talla ${i.size})`).join(', ')}`;
+      `*Pedido:* ${order.orderNumber}\n` +
+      `*Cliente:* ${order.customer.name}\n` +
+      `*Total:* $${order.totalAmount} USD\n` +
+      `*Modalidad:* ${order.isCredit ? 'A Credito (Cuotas quincenales)' : 'De Contado'}\n` +
+      `*Items:* ${order.items.map(i => `${i.name} (Talla ${i.size})`).join(', ')}`;
 
     navigator.clipboard.writeText(text);
     setCopied(true);

@@ -4,7 +4,11 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Product, CartItem, Order, StoreSettings } from '@/types';
 import Navbar from '@/components/Navbar';
 import HeroBanner from '@/components/HeroBanner';
-import ProductCard from '@/components/ProductCard';
+import ProductCard3D from '@/components/ProductCard3D';
+import BackgroundGlow from '@/components/BackgroundGlow';
+import MouseFollower from '@/components/MouseFollower';
+import FloatingCartPill from '@/components/FloatingCartPill';
+import RotatingWhatsAppStamp from '@/components/RotatingWhatsAppStamp';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import CartDrawer from '@/components/CartDrawer';
 import CheckoutModal from '@/components/CheckoutModal';
@@ -45,18 +49,7 @@ export default function StorefrontPage() {
   const [whatsAppRedirectUrl, setWhatsAppRedirectUrl] = useState('');
   const [isCreditExplainerOpen, setIsCreditExplainerOpen] = useState(false);
 
-  // Interactive mouse spotlight effect
-  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
-
   const catalogRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   // Load products and settings
   useEffect(() => {
@@ -196,19 +189,14 @@ export default function StorefrontPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#08090e] relative overflow-x-hidden">
-      {/* Interactive Eduardo-style Pointer Spotlight Glow */}
-      <div
-        className="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300 hidden md:block"
-        style={{
-          background: `radial-gradient(550px circle at ${mousePos.x}px ${mousePos.y}px, rgba(244, 63, 94, 0.06), transparent 75%)`,
-        }}
-      />
+    <div className="min-h-screen flex flex-col bg-[#06060c] relative overflow-x-hidden">
+      {/* High-End Ambient Background & Dynamic Spotlight Glow (Unique Capital / Iqxion style) */}
+      <BackgroundGlow />
 
-      {/* Subtle Background Cyber Grid */}
-      <div className="fixed inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+      {/* Magnetic Smooth Mouse Follower */}
+      <MouseFollower />
 
-      {/* Navbar (Admin link removed from storefront) */}
+      {/* Navbar (Clean luxury look, Admin link removed) */}
       <Navbar
         cartCount={totalCartCount}
         onOpenCart={() => setIsCartOpen(true)}
@@ -230,22 +218,25 @@ export default function StorefrontPage() {
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 text-rose-500 font-bold text-xs uppercase tracking-widest mb-1">
+              <div className="flex items-center gap-2 text-[#D1C4FF] font-mono font-bold text-xs uppercase tracking-widest mb-1">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Explorar Modelos Disponibles</span>
+                <span>Colección Exclusiva 2026</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-white">
-                Catálogo de Zapatos ({filteredProducts.length})
+              <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+                Modelos Disponibles{' '}
+                <span className="text-[#D1C4FF] font-mono font-bold text-xl sm:text-2xl">
+                  ({filteredProducts.length})
+                </span>
               </h2>
             </div>
 
             {/* Sort & Quick info */}
             <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-400 font-semibold hidden sm:inline">Ordenar por:</span>
+              <span className="text-xs text-slate-400 font-mono font-semibold hidden sm:inline">Ordenar por:</span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-rose-500"
+                className="bg-[#0b0c16] border border-white/[0.08] rounded-2xl px-3.5 py-2 text-xs font-mono text-white focus:outline-none focus:ring-1 focus:ring-[#D1C4FF] shadow-lg backdrop-blur-xl"
               >
                 <option value="featured">Destacados / Populares</option>
                 <option value="name-asc">Nombre (A - Z)</option>
@@ -255,13 +246,13 @@ export default function StorefrontPage() {
           </div>
 
           {/* Brand Filter Chips Carousel */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+          <div className="flex items-center gap-2.5 overflow-x-auto pb-2 no-scrollbar">
             <button
               onClick={() => setSelectedBrand('all')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`px-4 py-2.5 rounded-2xl text-xs font-mono font-bold whitespace-nowrap transition-all ${
                 selectedBrand === 'all'
-                  ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30'
-                  : 'bg-slate-900/80 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700'
+                  ? 'bg-[#D1C4FF] text-[#06060c] shadow-[0_0_20px_rgba(209,196,255,0.4)]'
+                  : 'bg-white/[0.03] text-slate-300 hover:text-white border border-white/[0.08] hover:border-white/20 backdrop-blur-md'
               }`}
             >
               Todas las Marcas ({products.length})
@@ -270,10 +261,10 @@ export default function StorefrontPage() {
               <button
                 key={brand}
                 onClick={() => setSelectedBrand(brand)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                className={`px-4 py-2.5 rounded-2xl text-xs font-mono font-bold whitespace-nowrap transition-all ${
                   selectedBrand.toLowerCase() === brand.toLowerCase()
-                    ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30'
-                    : 'bg-slate-900/80 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700'
+                    ? 'bg-[#D1C4FF] text-[#06060c] shadow-[0_0_20px_rgba(209,196,255,0.4)]'
+                    : 'bg-white/[0.03] text-slate-300 hover:text-white border border-white/[0.08] hover:border-white/20 backdrop-blur-md'
                 }`}
               >
                 {brand}
@@ -282,18 +273,18 @@ export default function StorefrontPage() {
           </div>
 
           {/* Size Filter Pills Bar */}
-          <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/80 flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 mr-2">
-              <Filter className="w-3.5 h-3.5 text-rose-500" />
+          <div className="p-4 rounded-3xl bg-[#0c0d18]/80 border border-white/[0.08] backdrop-blur-2xl flex flex-wrap items-center gap-2 shadow-xl">
+            <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-300 mr-2">
+              <Filter className="w-3.5 h-3.5 text-[#D1C4FF]" />
               <span>Filtrar por Talla:</span>
             </div>
 
             <button
               onClick={() => setSelectedSize(null)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3 py-1 rounded-xl text-xs font-mono font-bold transition-all ${
                 selectedSize === null
-                  ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
-                  : 'bg-slate-800/60 text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#D1C4FF]/20 text-[#D1C4FF] border border-[#D1C4FF]/50 shadow-[0_0_12px_rgba(209,196,255,0.3)]'
+                  : 'bg-white/[0.03] text-slate-400 hover:text-slate-200 border border-transparent'
               }`}
             >
               Cualquiera
@@ -303,10 +294,10 @@ export default function StorefrontPage() {
               <button
                 key={size}
                 onClick={() => setSelectedSize(selectedSize === size ? null : size)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                className={`px-3 py-1 rounded-xl text-xs font-mono font-bold transition-all ${
                   selectedSize === size
-                    ? 'bg-rose-600 text-white shadow-md shadow-rose-600/40 ring-1 ring-rose-400'
-                    : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700/50'
+                    ? 'bg-[#D1C4FF] text-[#06060c] shadow-[0_0_15px_rgba(209,196,255,0.5)] ring-1 ring-[#D1C4FF]'
+                    : 'bg-white/[0.03] text-slate-300 hover:bg-white/[0.07] border border-white/[0.08]'
                 }`}
               >
                 EU {size}
@@ -315,13 +306,13 @@ export default function StorefrontPage() {
           </div>
         </div>
 
-        {/* Product Cards Grid */}
+        {/* Product Cards Grid with 3D Tilt & Specular Highlights */}
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
-                className="aspect-[3/4] rounded-2xl bg-slate-900/60 border border-slate-800 animate-pulse"
+                className="aspect-[3/4] rounded-3xl bg-slate-900/60 border border-slate-800 animate-pulse"
               />
             ))}
           </div>
@@ -348,7 +339,7 @@ export default function StorefrontPage() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {filteredProducts.map((product) => (
-              <ProductCard
+              <ProductCard3D
                 key={product.id}
                 product={product}
                 onSelectProduct={handleSelectProduct}
@@ -359,12 +350,12 @@ export default function StorefrontPage() {
         )}
       </main>
 
-      {/* Floating Action Cart Pill (Noticeable & Interactive) */}
+      {/* Floating Dynamic Action Cart Pill */}
       {cartItems.length > 0 && (
         <div className="fixed bottom-24 right-6 z-40">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-600 text-white font-extrabold text-sm shadow-[0_10px_35px_rgba(244,63,94,0.55)] border border-rose-300/40 flex items-center gap-3.5 hover:scale-105 active:scale-95 transition-all group backdrop-blur-md"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-600 text-white font-extrabold text-sm shadow-[0_10px_40px_rgba(244,63,94,0.6)] border border-rose-300/40 flex items-center gap-3.5 hover:scale-105 active:scale-95 transition-all group backdrop-blur-xl"
           >
             <div className="relative">
               <ShoppingBag className="w-5 h-5 text-white" />
@@ -383,9 +374,9 @@ export default function StorefrontPage() {
 
       {/* Credit Explanation Modal */}
       {isCreditExplainerOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
           <div
-            className="relative w-full max-w-md bg-[#11131e] border border-slate-700 rounded-3xl p-6 md:p-8 text-white shadow-2xl"
+            className="relative w-full max-w-md bg-[#0f111a] border border-slate-700/80 rounded-3xl p-6 md:p-8 text-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -448,16 +439,17 @@ export default function StorefrontPage() {
         </div>
       )}
 
-      {/* Floating WhatsApp Quick Action Button */}
-      <a
-        href={`https://api.whatsapp.com/send?phone=${settings?.ownerWhatsApp || '584248057420'}&text=${encodeURIComponent('Hola! Quisiera hacerte una pregunta sobre los zapatos disponibles.')}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-40 p-4 rounded-full text-white whatsapp-glow flex items-center justify-center hover:scale-110 transition-transform shadow-2xl"
-        title="Preguntar al vendedor por WhatsApp"
-      >
-        <MessageCircle className="w-6 h-6" />
-      </a>
+      {/* Dynamic Floating Cart Island (Appears when cart has items) */}
+      <FloatingCartPill
+        items={cartItems}
+        onOpenCart={() => setIsCartOpen(true)}
+      />
+
+      {/* Signature Rotating Contact Stamp Widget (Unique Capital style) */}
+      <RotatingWhatsAppStamp
+        whatsappNumber={settings?.ownerWhatsApp || '584248057420'}
+        whatsappDisplay={settings?.ownerWhatsAppDisplay || '+58 424-8057420'}
+      />
 
       {/* Modals & Slide-overs */}
       <ProductDetailModal

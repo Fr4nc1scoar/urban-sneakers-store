@@ -24,17 +24,18 @@ function formatDateSafe(dateStr: string): string {
 }
 
 // Generate the customer checkout WhatsApp order message to the store owner (+58 424-8057420)
-// Emojis removed to prevent the  replacement character bug in WhatsApp Web / Mobile redirects
+// 100% ASCII-clean formatting: NO raw emojis, NO diamonds (◆/◈), NO unicode bullets (•)
+// This completely prevents the  (U+FFFD) replacement character bug in WhatsApp Web
 export function generateOrderWhatsAppMessage(order: Order, settings: StoreSettings): string {
   const itemsList = order.items
     .map(
       (item, idx) =>
         `*${idx + 1}. ${item.name}*\n` +
-        `   • Marca: ${item.brand}\n` +
-        `   • Talla: EU ${item.size}\n` +
-        `   • Cantidad: ${item.quantity}\n` +
-        `   • Precio: $${item.price} c/u\n` +
-        `   • Subtotal: $${item.price * item.quantity}`
+        `   - Marca: ${item.brand}\n` +
+        `   - Talla: EU ${item.size}\n` +
+        `   - Cantidad: ${item.quantity}\n` +
+        `   - Precio: $${item.price} c/u\n` +
+        `   - Subtotal: $${item.price * item.quantity}`
     )
     .join('\n\n');
 
@@ -52,25 +53,25 @@ export function generateOrderWhatsAppMessage(order: Order, settings: StoreSettin
   const dateFormatted = formatDateSafe(order.createdAt);
 
   const message =
-    `*¡NUEVO PEDIDO DE ZAPATOS - ${settings.storeName.toUpperCase()}!*\n` +
+    `*NUEVO PEDIDO DE ZAPATOS - ${settings.storeName.toUpperCase()}*\n` +
     `----------------------------------------\n` +
     `*Pedido #:* ${order.orderNumber}\n` +
     `*Fecha:* ${dateFormatted}\n` +
     `----------------------------------------\n\n` +
     `*DATOS DEL CLIENTE:*\n` +
-    `• *Nombre:* ${order.customer.name}\n` +
-    `• *Telefono:* ${order.customer.phone}\n` +
-    `• *Ciudad:* ${order.customer.city}\n` +
-    `• *Direccion de Entrega:* ${order.customer.address}\n` +
-    (order.customer.idNumber ? `• *C.I. / Identificacion:* ${order.customer.idNumber}\n` : '') +
-    (order.customer.notes ? `• *Observaciones:* ${order.customer.notes}\n` : '') +
+    `- *Nombre:* ${order.customer.name}\n` +
+    `- *Telefono:* ${order.customer.phone}\n` +
+    `- *Ciudad:* ${order.customer.city}\n` +
+    `- *Direccion de Entrega:* ${order.customer.address}\n` +
+    (order.customer.idNumber ? `- *C.I. / Identificacion:* ${order.customer.idNumber}\n` : '') +
+    (order.customer.notes ? `- *Observaciones:* ${order.customer.notes}\n` : '') +
     `\n*DETALLE DEL PEDIDO:*\n` +
     `${itemsList}\n\n` +
     `----------------------------------------\n` +
     `*TOTAL A PAGAR:* *$${order.totalAmount} USD*\n` +
     `*Modalidad elegida:* ${paymentText}\n` +
     `----------------------------------------\n\n` +
-    `_Hola, quiero concretar mi pedido y acordar la entrega y detalles del pago. ¡Quedo atento a tu respuesta!_`;
+    `_Hola, quiero concretar mi pedido y acordar la entrega y detalles del pago. Quedo atento a tu respuesta._`;
 
   return message;
 }
@@ -82,7 +83,7 @@ export function getOrderWhatsAppUrl(order: Order, settings: StoreSettings): stri
   return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
 }
 
-// Generate polite collection reminder for an installment (100% clean formatting without emojis)
+// Generate polite collection reminder for an installment (100% clean formatting without emojis or unicode symbols)
 export function generateInstallmentReminderMessage(
   order: Order,
   installment: Installment,
@@ -97,10 +98,10 @@ export function generateInstallmentReminderMessage(
 
   const paymentMethods =
     `*DATOS PARA EL PAGO:*\n` +
-    `• *Pago Movil:* ${settings.paymentDetails.pagoMovil.banco} | C.I: ${settings.paymentDetails.pagoMovil.cedula} | Telf: ${settings.paymentDetails.pagoMovil.telefono} (${settings.paymentDetails.pagoMovil.titular})\n` +
-    `• *Binance Pay ID:* ${settings.paymentDetails.binancePay.payId}\n` +
-    (settings.paymentDetails.zelle.email ? `• *Zelle:* ${settings.paymentDetails.zelle.email}\n` : '') +
-    `• *Efectivo:* Previo acuerdo de entrega`;
+    `- *Pago Movil:* ${settings.paymentDetails.pagoMovil.banco} | C.I: ${settings.paymentDetails.pagoMovil.cedula} | Telf: ${settings.paymentDetails.pagoMovil.telefono} (${settings.paymentDetails.pagoMovil.titular})\n` +
+    `- *Binance Pay ID:* ${settings.paymentDetails.binancePay.payId}\n` +
+    (settings.paymentDetails.zelle.email ? `- *Zelle:* ${settings.paymentDetails.zelle.email}\n` : '') +
+    `- *Efectivo:* Previo acuerdo de entrega`;
 
   const dueDateFormatted = formatDateSafe(installment.dueDate);
 
@@ -109,14 +110,14 @@ export function generateInstallmentReminderMessage(
     `----------------------------------------\n` +
     `Hola, estimado/a *${order.customer.name}*\n\n` +
     `Esperamos te encuentres muy bien. Te escribimos de parte de *${settings.storeName}* para recordarte la cuota de tu compra a credito (${itemSummary}):\n\n` +
-    `• *Cuota:* #${installment.number} de ${installment.totalInstallments}\n` +
-    `• *Monto a pagar:* *$${installment.amount} USD* (o al cambio del dia en Bs.)\n` +
-    `• *Fecha limite de pago:* ${dueDateFormatted}\n` +
-    `• *Pedido ref:* ${order.orderNumber}\n\n` +
+    `- *Cuota:* #${installment.number} de ${installment.totalInstallments}\n` +
+    `- *Monto a pagar:* *$${installment.amount} USD* (o al cambio del dia en Bs.)\n` +
+    `- *Fecha limite de pago:* ${dueDateFormatted}\n` +
+    `- *Pedido ref:* ${order.orderNumber}\n\n` +
     `----------------------------------------\n` +
     `${paymentMethods}\n` +
     `----------------------------------------\n\n` +
-    `_Por favor, una vez realices tu pago, envianos el comprobante por este medio para registrarlo en tu cuenta. ¡Muchas gracias por tu puntualidad y preferencia!_`;
+    `_Por favor, una vez realices tu pago, envianos el comprobante por este medio para registrarlo en tu cuenta. Muchas gracias por tu puntualidad y preferencia._`;
 
   return message;
 }
