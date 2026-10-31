@@ -1,0 +1,53 @@
+[
+  {
+    "id": "ord_sample_01",
+    "orderNumber": "ALB-5821",
+    "createdAt": "2026-10-30T17:02:20.429Z",
+    "customer": {
+      "name": "Manuel Rodríguez",
+      "phone": "+58 412-5558899",
+      "city": "Caracas",
+      "address": "Chacao, Av. Libertador",
+      "idNumber": "V-22.456.789",
+      "notes": "Por favor enviar en caja original con entrega en la tarde."
+    },
+    "items": [
+      {
+        "productId": "nike-sb-dunk-28a8ed32-bde",
+        "name": "Nike sb dunk",
+        "brand": "Nike",
+        "image": "https://assets.olaclick.app/companies/products/images/800/28a8ed32-bde7-492d-8564-aad565f434f5.jpg",
+        "size": 42,
+        "price": 50,
+        "quantity": 1
+      }
+    ],
+    "totalAmount": 50,
+    "paymentPreference": "credit",
+    "status": "pending_confirmation",
+    "isCredit": true,
+    "creditPlan": {
+      "frequency": "quincenal",
+      "totalInstallments": 2,
+      "installments": [
+        {
+          "id": "inst_1_sample",
+          "number": 1,
+          "totalInstallments": 2,
+          "amount": 25,
+          "dueDate": "2026-11-15",
+          "status": "pending"
+        },
+        {
+          "id": "inst_2_sample",
+          "number": 2,
+          "totalInstallments": 2,
+          "amount": 25,
+          "dueDate": "2026-11-30",
+          "status": "pending"
+        }
+      ],
+      "notes": "Crédito acordado a 2 cuotas quincenales de $25"
+    }
+  }
+]
