@@ -92,18 +92,18 @@ export default function BackgroundGlow() {
         }}
       />
 
-      {/* Vibrant Ambient Colorful Nebulas (GPU accelerated, blur optimized) */}
+      {/* Vibrant Ambient Colorful Nebulas (GPU accelerated, mobile optimized) */}
       {/* Top Left: Vivid Rose & Fuchsia */}
-      <div className="absolute -top-[12%] -left-[8%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full bg-gradient-to-br from-rose-600/25 via-pink-600/18 to-transparent blur-[120px] pointer-events-none" />
+      <div className="absolute -top-[12%] -left-[8%] w-[60vw] h-[60vw] md:w-[50vw] md:h-[50vw] max-w-[700px] max-h-[700px] rounded-full bg-gradient-to-br from-rose-600/25 via-pink-600/18 to-transparent blur-3xl md:blur-[120px] pointer-events-none" />
 
       {/* Top Right: Cyber Cyan & Electric Blue */}
-      <div className="absolute top-[5%] -right-[10%] w-[45vw] h-[45vw] max-w-[650px] max-h-[650px] rounded-full bg-gradient-to-bl from-cyan-500/22 via-blue-600/16 to-transparent blur-[130px] pointer-events-none" />
+      <div className="absolute top-[5%] -right-[10%] w-[55vw] h-[55vw] md:w-[45vw] md:h-[45vw] max-w-[650px] max-h-[650px] rounded-full bg-gradient-to-bl from-cyan-500/22 via-blue-600/16 to-transparent blur-3xl md:blur-[130px] pointer-events-none" />
 
-      {/* Center Left: Electric Violet */}
-      <div className="absolute top-[45%] -left-[12%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-r from-purple-600/20 via-violet-600/14 to-transparent blur-[140px] pointer-events-none" />
+      {/* Center Left: Electric Violet (Desktop & Tablet) */}
+      <div className="hidden md:block absolute top-[45%] -left-[12%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-r from-purple-600/20 via-violet-600/14 to-transparent blur-[140px] pointer-events-none" />
 
-      {/* Bottom Center: Warm Amber Gold */}
-      <div className="absolute -bottom-[15%] left-[25%] w-[50vw] h-[50vw] max-w-[750px] max-h-[750px] rounded-full bg-gradient-to-tr from-amber-500/18 via-orange-600/14 to-transparent blur-[150px] pointer-events-none" />
+      {/* Bottom Center: Warm Amber Gold (Desktop & Tablet) */}
+      <div className="hidden md:block absolute -bottom-[15%] left-[25%] w-[50vw] h-[50vw] max-w-[750px] max-h-[750px] rounded-full bg-gradient-to-tr from-amber-500/18 via-orange-600/14 to-transparent blur-[150px] pointer-events-none" />
     </div>
   );
 }

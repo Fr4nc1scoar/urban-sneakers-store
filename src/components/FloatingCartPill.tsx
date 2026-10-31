@@ -24,7 +24,7 @@ export default function FloatingCartPill({ items, onOpenCart }: FloatingCartPill
   return (
     <aside
       aria-label="Resumen de tu carrito de compras"
-      className="fixed bottom-4 left-3 right-20 sm:right-auto sm:left-6 sm:bottom-6 lg:bottom-10 lg:left-10 z-40 sm:max-w-md animate-in fade-in slide-in-from-bottom-6 duration-300"
+      className="fixed bottom-3 left-3 right-[96px] sm:right-auto sm:left-6 sm:bottom-6 lg:bottom-10 lg:left-10 z-40 sm:max-w-md animate-in fade-in slide-in-from-bottom-6 duration-300"
     >
       <div
         onClick={onOpenCart}

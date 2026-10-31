@@ -23,6 +23,7 @@ import {
   X,
   CreditCard,
   Zap,
+  Search,
 } from 'lucide-react';
 
 export default function StorefrontPage() {
@@ -35,6 +36,13 @@ export default function StorefrontPage() {
   const [selectedBrand, setSelectedBrand] = useState('all');
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<'featured' | 'name-asc' | 'brand'>('featured');
+  // Progressive batch loading for silky smooth 60-120 FPS mobile performance (prevents mobile phone lag/freeze)
+  const [visibleCount, setVisibleCount] = useState(24);
+
+  // Reset batch count when any filter or search changes
+  useEffect(() => {
+    setVisibleCount(24);
+  }, [searchQuery, selectedBrand, selectedSize, sortBy]);
 
   // Cart & Modals
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -49,6 +57,7 @@ export default function StorefrontPage() {
   const [isCreditExplainerOpen, setIsCreditExplainerOpen] = useState(false);
 
   const catalogRef = useRef<HTMLDivElement>(null);
+  const loadMoreSentinelRef = useRef<HTMLDivElement>(null);
 
   // Load products and settings
   useEffect(() => {
@@ -121,6 +130,31 @@ export default function StorefrontPage() {
         return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
       });
   }, [products, selectedBrand, selectedSize, searchQuery, sortBy]);
+
+  // Sliced products for batch rendering (prevents memory spikes on mobile phones)
+  const visibleProducts = useMemo(() => {
+    return filteredProducts.slice(0, visibleCount);
+  }, [filteredProducts, visibleCount]);
+
+  // Progressive batch loading IntersectionObserver for silky smooth 60-120 FPS mobile performance
+  useEffect(() => {
+    if (!loadMoreSentinelRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => {
+            if (prev < filteredProducts.length) {
+              return prev + 24;
+            }
+            return prev;
+          });
+        }
+      },
+      { rootMargin: '400px' }
+    );
+    observer.observe(loadMoreSentinelRef.current);
+    return () => observer.disconnect();
+  }, [filteredProducts.length]);
 
   // Cart operations
   const handleAddToCart = (product: Product, size: number, quantity: number) => {
@@ -209,8 +243,8 @@ export default function StorefrontPage() {
       />
 
       {/* Catalog & Filter Section */}
-      <main ref={catalogRef} className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 relative z-10">
-        {/* Section title & Brand Pills */}
+      <main ref={catalogRef} id="catalogo" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6 sm:space-y-8 relative z-10">
+        {/* Section title & Filters */}
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
@@ -232,13 +266,35 @@ export default function StorefrontPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-[#0b0c16] border border-white/[0.12] rounded-2xl px-3.5 py-2 text-xs font-mono text-white focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-lg backdrop-blur-xl"
+                className="bg-[#0b0c16] border border-white/[0.12] rounded-2xl px-3.5 py-2.5 text-xs font-mono text-white focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-lg backdrop-blur-xl"
               >
                 <option value="featured">Destacados / Populares</option>
                 <option value="name-asc">Nombre (A - Z)</option>
                 <option value="brand">Por Marca</option>
               </select>
             </div>
+          </div>
+
+          {/* Integrated Ergonomic Search Bar - Direct in Catalog (No scrolling back up needed) */}
+          <div className="relative w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-rose-400 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar por modelo (ej. Dunk, Jordan 4, Samba), marca o talla..."
+              className="w-full pl-11 pr-11 py-3 sm:py-3.5 bg-[#0e101d]/95 border border-white/[0.14] focus:border-rose-500 rounded-2xl text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/40 shadow-xl backdrop-blur-xl transition-all"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-slate-300 hover:text-white transition-colors"
+                title="Limpiar búsqueda"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           {/* Brand Filter Chips Carousel with High-Energy Neons */}
@@ -333,40 +389,45 @@ export default function StorefrontPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {filteredProducts.map((product) => (
-              <ProductCard3D
-                key={product.id}
-                product={product}
-                onSelectProduct={handleSelectProduct}
-                onQuickAdd={(p, size) => handleAddToCart(p, size, 1)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              {visibleProducts.map((product) => (
+                <ProductCard3D
+                  key={product.id}
+                  product={product}
+                  onSelectProduct={handleSelectProduct}
+                  onQuickAdd={(p, size) => handleAddToCart(p, size, 1)}
+                />
+              ))}
+            </div>
+
+            {/* Load More Models Controls */}
+            {visibleCount < filteredProducts.length && (
+              <div className="pt-8 pb-4 flex flex-col items-center justify-center gap-3">
+                <div className="text-xs font-mono text-slate-400 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>
+                    Mostrando <strong className="text-white">{Math.min(visibleCount, filteredProducts.length)}</strong> de{' '}
+                    <strong className="text-rose-400">{filteredProducts.length}</strong> modelos disponibles
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount((prev) => prev + 24)}
+                  data-interactive="true"
+                  className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-rose-600 via-pink-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white font-mono font-bold text-xs sm:text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(244,63,94,0.45)] hover:shadow-[0_0_35px_rgba(244,63,94,0.7)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2.5 border border-white/20"
+                >
+                  <span>Cargar Más Modelos (+24)</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            {/* Scroll Sentinel for Smooth Auto-Loading */}
+            <div ref={loadMoreSentinelRef} className="h-4 w-full pointer-events-none" />
+          </>
         )}
       </main>
-
-      {/* Floating Dynamic Action Cart Pill */}
-      {cartItems.length > 0 && (
-        <div className="fixed bottom-24 right-6 z-40">
-          <button
-            onClick={() => setIsCartOpen(true)}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-600 text-white font-extrabold text-sm shadow-[0_10px_40px_rgba(244,63,94,0.6)] border border-rose-300/40 flex items-center gap-3.5 hover:scale-105 active:scale-95 transition-all group backdrop-blur-xl"
-          >
-            <div className="relative">
-              <ShoppingBag className="w-5 h-5 text-white" />
-              <span className="absolute -top-2.5 -right-2.5 min-w-[20px] h-5 px-1 rounded-full bg-black text-rose-400 text-xs font-black flex items-center justify-center border border-rose-500">
-                {totalCartCount}
-              </span>
-            </div>
-            <div className="text-left flex flex-col">
-              <span className="text-xs font-black uppercase tracking-wider">Ver Carrito</span>
-              <span className="text-[11px] text-rose-100 font-semibold">${totalCartAmount} USD • En cuotas</span>
-            </div>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
-      )}
 
       {/* Credit Explanation Modal */}
       {isCreditExplainerOpen && (
